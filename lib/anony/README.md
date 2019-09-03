@@ -1,10 +1,14 @@
 # Anony
 
 > Anony is a small library that defines how ActiveRecord models should be anonymised for
-> deletion purposes, by explicitly declaring which fields should be altered (and which
-> ones should not).
+> deletion purposes.
 
 ## Usage
+
+The main idea is that you define which fields on a model should be anonymised and,
+crucially, which ones should not. This means that when you're adding a new column to an
+anonymisable model, you will be reminded that you need to define the anonymisation
+strategy for that column.
 
 ```ruby
 class Employee < ApplicationRecord
@@ -54,6 +58,21 @@ manager.anonymise
 
 manager.save!
  => true
+```
+
+It's possible to ignore some common columns using configuration. For example, in Rails
+applications, the `id`, `created_at` and `updated_at` fields are unlikely to be
+anonymisable. When the configuration is validated, Anony won't throw an error for those
+columns to be ignored. If you try and ignore one of these columns, it will throw an error,
+but you are still free to define another anonymisation strategy for them.
+
+In an initializer (or at application boot outside Rails), you can set these ignorable
+fields like so:
+
+```ruby
+# config/initializers/anony.rb
+
+Anony::Config.ignore_fields(:id, :created_at, :updated_at)
 ```
 
 ## Testing
