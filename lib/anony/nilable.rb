@@ -2,7 +2,7 @@
 
 module Anony
   module Nilable
-    def self.call(*_)
+    def self.call(_value)
       nil
     end
   end

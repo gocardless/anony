@@ -4,7 +4,7 @@ require "securerandom"
 
 module Anony
   module AnonymisedEmail
-    def self.call(_value, _)
+    def self.call(_value)
       "anonymous+#{SecureRandom.uuid}@gocardless.com"
     end
   end
