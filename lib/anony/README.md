@@ -15,7 +15,7 @@ class Employee < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    hex :first_name, opts: { max_length: 12 }
+    hex :first_name, max_length: 12
     nilable :middle_name
     ignore :id
   end
@@ -32,11 +32,11 @@ employee.save!
 ```
 
 Anony defines some common strategies internally, but you can also write your own - they
-just need to be objects which conform to the `.call(value, opts: {})` signature:
+just need to be objects which conform to the `.call(existing_value)` signature:
 
 ```ruby
 module OverwriteUUID
-  def self.call(_value, opts: {})
+  def self.call(_existing_value)
     SecureRandom.uuid
   end
 end
@@ -45,8 +45,8 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    with_strategy :id, OverwriteUUID
-    with_strategy(:first_name) { |name, _opts| name.reverse }
+    with_strategy OverwriteUUID, :id
+    with_strategy(:first_name) { |name| Digest::SHA2.hexdigest(name) }
   end
 end
 

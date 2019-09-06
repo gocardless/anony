@@ -19,7 +19,7 @@ RSpec.describe Anony::Anonymisable do
       attr_accessor :d_field
 
       anonymise do
-        with_strategy :a_field, StubAnoynmiser
+        with_strategy StubAnoynmiser, :a_field
         with_strategy(:b_field) { |v, _| v.reverse }
         ignore :c_field, :d_field
       end
@@ -86,7 +86,7 @@ RSpec.describe Anony::Anonymisable do
         attr_accessor :b_field
 
         anonymise do
-          with_strategy :a_field, StubAnoynmiser
+          with_strategy StubAnoynmiser, :a_field
         end
 
         def self.column_names
@@ -113,7 +113,7 @@ RSpec.describe Anony::Anonymisable do
       end
 
       expect { InvalidStubModel.anonymise { ignore :id } }.to raise_error(
-        ArgumentError, "Trying to ignore `id` which is already ignored in Anony::Config"
+        ArgumentError, "Cannot ignore [:id] (fields already ignored in Anony::Config)"
       )
     end
 
@@ -123,7 +123,7 @@ RSpec.describe Anony::Anonymisable do
 
         attr_accessor :id, :name
 
-        anonymise { with_strategy(:name, StubAnoynmiser) }
+        anonymise { with_strategy(StubAnoynmiser, :name) }
 
         def self.column_names
           %w[id name]
@@ -140,7 +140,7 @@ RSpec.describe Anony::Anonymisable do
       attr_accessor :a_field
 
       anonymise do
-        with_strategy :a_field, StubAnoynmiser
+        with_strategy StubAnoynmiser, :a_field
       end
 
       def self.column_names
@@ -153,7 +153,7 @@ RSpec.describe Anony::Anonymisable do
       attr_accessor :b_field
 
       anonymise do
-        with_strategy :b_field, StubAnoynmiser
+        with_strategy StubAnoynmiser, :b_field
       end
 
       def self.column_names
@@ -165,6 +165,88 @@ RSpec.describe Anony::Anonymisable do
       #  We had a case where these leaked, so we want to explicitly test it.
       expect(AClass.anonymisable_fields).to match(a_field: anything)
       expect(BClass.anonymisable_fields).to match(b_field: anything)
+    end
+  end
+
+  describe "#with_strategy" do
+    let(:config) { Anony::AnonymisableConfig.new }
+
+    context "no arguments" do
+      it "throws an argumenterror" do
+        expect { config.with_strategy }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "strategy without any fields" do
+      it "throws an argumenterror" do
+        expect { config.with_strategy(StubAnoynmiser) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "field without any strategy" do
+      it "throws an argumenterror" do
+        expect { config.with_strategy(:field) }.to raise_error(ArgumentError)
+      end
+    end
+
+    context "two arguments" do
+      it "registers the field to the strategy" do
+        config.with_strategy(StubAnoynmiser, :field)
+        expect(config.anonymisable_fields).to eq(field: StubAnoynmiser)
+      end
+
+      it "with a block" do
+        config.with_strategy(:foo, :bar) { |v| v }
+        expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
+      end
+    end
+
+    context "a strategy for two fields" do
+      it "registers them correctly" do
+        config.with_strategy(StubAnoynmiser, :foo, :bar)
+        expect(config.anonymisable_fields).to eq(foo: StubAnoynmiser, bar: StubAnoynmiser)
+      end
+    end
+  end
+
+  describe "helper methods" do
+    let(:model) do
+      klass = Class.new do
+        include Anony::Anonymisable
+
+        attr_accessor :null, :hexy, :mailo
+
+        anonymise do
+          nilable :null
+          hex :hexy
+          email :mailo
+        end
+
+        def self.column_names
+          %w[null hexy mailo]
+        end
+
+        alias_method :read_attribute, :send
+        def write_attribute(field, value)
+          send("#{field}=", value)
+        end
+      end
+
+      klass.new
+    end
+
+    before do
+      model.null = "foo"
+      model.hexy = "bar"
+      model.mailo = "baz"
+    end
+
+    it "calls the relevant anonymisers" do
+      expect(Anony::Nilable).to receive(:call).with("foo")
+      expect_any_instance_of(Anony::OverwriteHex).to receive(:call).with("bar")
+      expect(Anony::AnonymisedEmail).to receive(:call).with("baz")
+
+      model.anonymise
     end
   end
 end

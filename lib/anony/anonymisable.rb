@@ -4,26 +4,28 @@ require "active_support/concern"
 
 module Anony
   class AnonymisableConfig
-    def with_strategy(field, strategy = nil, **opts, &block)
-      if block_given?
+    def with_strategy(strategy, *fields, &block)
+      unless strategy.respond_to?(:call)
+        fields.unshift(strategy)
         strategy = block
-      else
-        raise StrategyException, strategy unless strategy.respond_to?(:call)
       end
 
-      anonymisable_fields[field] = { strategy: strategy, opts: opts }
+      raise ArgumentError, "Block or Strategy object required" unless strategy
+      raise ArgumentError, "One or more fields required" unless fields.any?
+
+      fields.each { |field| anonymisable_fields[field] = strategy }
     end
 
-    def hex(field, max_length: 36)
-      with_strategy(field, OverwriteHex, max_length: max_length)
+    def hex(*fields, max_length: 36)
+      with_strategy(OverwriteHex.new(max_length), *fields)
     end
 
-    def email(field)
-      with_strategy(field, AnonymisedEmail)
+    def email(*fields)
+      with_strategy(AnonymisedEmail, *fields)
     end
 
-    def nilable(field)
-      with_strategy(field, Nilable)
+    def nilable(*fields)
+      with_strategy(Nilable, *fields)
     end
 
     def anonymisable_fields
@@ -31,14 +33,14 @@ module Anony
     end
 
     def ignore(*fields)
-      fields.each do |field|
-        if Config.ignore?(field)
-          raise ArgumentError,
-                "Trying to ignore `#{field}` which is already ignored in Anony::Config"
-        end
+      already_ignored = fields.select { |field| Config.ignore?(field) }
 
-        with_strategy(field, NoOp)
+      if already_ignored.any?
+        raise ArgumentError, "Cannot ignore #{already_ignored.inspect} " \
+                             "(fields already ignored in Anony::Config)"
       end
+
+      with_strategy(NoOp, *fields)
     end
   end
 
@@ -46,24 +48,21 @@ module Anony
     extend ActiveSupport::Concern
 
     class_methods do
+      attr_reader :anonymisable_fields
+
       def anonymise(&block)
         anonymiser = AnonymisableConfig.new
         anonymiser.instance_eval(&block)
         @anonymisable_fields = anonymiser.anonymisable_fields
-      end
-
-      def anonymisable_fields
-        @anonymisable_fields
       end
     end
 
     def anonymise_field(field)
       raise FieldException, field unless self.class.anonymisable_fields.key?(field)
 
-      config = self.class.anonymisable_fields[field]
+      strategy = self.class.anonymisable_fields.fetch(field)
       current_value = read_attribute(field)
-      anonymised_value = config.fetch(:strategy).
-        call(current_value, **config.fetch(:opts))
+      anonymised_value = strategy.call(current_value)
 
       write_attribute(field, anonymised_value)
     end
