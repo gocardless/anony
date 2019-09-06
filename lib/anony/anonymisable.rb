@@ -31,7 +31,14 @@ module Anony
     end
 
     def ignore(*fields)
-      fields.each { |field| with_strategy(field, NoOp) }
+      fields.each do |field|
+        if Config.ignore?(field)
+          raise ArgumentError,
+                "Trying to ignore `#{field}` which is already ignored in Anony::Config"
+        end
+
+        with_strategy(field, NoOp)
+      end
     end
   end
 
@@ -77,9 +84,11 @@ module Anony
     end
 
     private def unhandled_fields
-      columns = self.class.column_names.map(&:to_sym)
+      anonymisable_columns =
+        self.class.column_names.map(&:to_sym).reject { |c| Config.ignore?(c) }
       handled_fields = self.class.anonymisable_fields.map { |k, _| k }
-      columns - handled_fields
+
+      anonymisable_columns - handled_fields
     end
   end
 end

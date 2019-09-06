@@ -102,6 +102,38 @@ RSpec.describe Anony::Anonymisable do
     end
   end
 
+  context "with ignored fields in Anony::Config" do
+    before { Anony::Config.ignore_fields(:id) }
+
+    it "throws an exception" do
+      class InvalidStubModel
+        include Anony::Anonymisable
+
+        attr_accessor :id
+      end
+
+      expect { InvalidStubModel.anonymise { ignore :id } }.to raise_error(
+        ArgumentError, "Trying to ignore `id` which is already ignored in Anony::Config"
+      )
+    end
+
+    it "doesn't warn about ignored :id field" do
+      klass = Class.new do
+        include Anony::Anonymisable
+
+        attr_accessor :id, :name
+
+        anonymise { with_strategy(:name, StubAnoynmiser) }
+
+        def self.column_names
+          %w[id name]
+        end
+      end
+
+      expect(klass.new).to be_valid_anonymisation
+    end
+  end
+
   context "with two models" do
     class AClass
       include Anony::Anonymisable
