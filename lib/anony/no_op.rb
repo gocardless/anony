@@ -2,7 +2,7 @@
 
 module Anony
   module NoOp
-    def self.call(value, *_)
+    def self.call(value)
       value
     end
   end

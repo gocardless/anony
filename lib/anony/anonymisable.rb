@@ -4,7 +4,7 @@ require "active_support/concern"
 
 module Anony
   class AnonymisableConfig
-    def with_strategy(field, strategy = nil, opts: {}, &block)
+    def with_strategy(field, strategy = nil, **opts, &block)
       if block_given?
         strategy = block
       else
@@ -14,8 +14,8 @@ module Anony
       anonymisable_fields[field] = { strategy: strategy, opts: opts }
     end
 
-    def hex(field, opts: {})
-      with_strategy(field, OverwriteHex, opts: opts)
+    def hex(field, max_length: 36)
+      with_strategy(field, OverwriteHex, max_length: max_length)
     end
 
     def email(field)
@@ -63,7 +63,7 @@ module Anony
       config = self.class.anonymisable_fields[field]
       current_value = read_attribute(field)
       anonymised_value = config.fetch(:strategy).
-        call(current_value, opts: config.fetch(:opts))
+        call(current_value, **config.fetch(:opts))
 
       write_attribute(field, anonymised_value)
     end
