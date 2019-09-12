@@ -3,6 +3,13 @@
 require "spec_helper"
 
 RSpec.describe Anony::Config do
+  around do |example|
+    original_ignores = described_class.ignores
+    example.call
+  ensure
+    described_class.ignores = original_ignores
+  end
+
   describe ".ignore?" do
     subject(:ignore?) { described_class.ignore?(field) }
 
@@ -30,6 +37,16 @@ RSpec.describe Anony::Config do
       let(:field) { :d }
 
       it { is_expected.to be false }
+    end
+  end
+
+  describe ".ignores" do
+    subject(:ignores) { described_class.ignores }
+
+    before { described_class.ignore_fields(:a) }
+
+    it "gives the current configuration back" do
+      expect(ignores).to eq([:a])
     end
   end
 end
