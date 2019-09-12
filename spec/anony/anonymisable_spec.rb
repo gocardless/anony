@@ -10,31 +10,33 @@ RSpec.describe Anony::Anonymisable do
   end
 
   context "valid model anonymisation" do
-    class StubModel
-      include Anony::Anonymisable
+    let(:model) do
+      klass = Class.new do
+        include Anony::Anonymisable
 
-      attr_accessor :a_field
-      attr_accessor :b_field
-      attr_accessor :c_field
-      attr_accessor :d_field
+        attr_accessor :a_field
+        attr_accessor :b_field
+        attr_accessor :c_field
+        attr_accessor :d_field
 
-      anonymise do
-        with_strategy StubAnoynmiser, :a_field
-        with_strategy(:b_field) { |v, _| v.reverse }
-        ignore :c_field, :d_field
+        anonymise do
+          with_strategy StubAnoynmiser, :a_field
+          with_strategy(:b_field) { |v, _| v.reverse }
+          ignore :c_field, :d_field
+        end
+
+        def self.column_names
+          %w[a_field b_field c_field d_field]
+        end
+
+        alias_method :read_attribute, :send
+        def write_attribute(field, value)
+          send("#{field}=", value)
+        end
       end
 
-      def self.column_names
-        %w[a_field b_field c_field d_field]
-      end
-
-      alias_method :read_attribute, :send
-      def write_attribute(field, value)
-        send("#{field}=", value)
-      end
+      klass.new
     end
-
-    let(:model) { StubModel.new }
 
     before do
       model.a_field = double
@@ -79,22 +81,24 @@ RSpec.describe Anony::Anonymisable do
 
   context "invalid model anonymisation" do
     describe "#valid_anonymisation?" do
-      class InvalidStubModel
-        include Anony::Anonymisable
+      let(:model) do
+        klass = Class.new do
+          include Anony::Anonymisable
 
-        attr_accessor :a_field
-        attr_accessor :b_field
+          attr_accessor :a_field
+          attr_accessor :b_field
 
-        anonymise do
-          with_strategy StubAnoynmiser, :a_field
+          anonymise do
+            with_strategy StubAnoynmiser, :a_field
+          end
+
+          def self.column_names
+            %w[a_field b_field]
+          end
         end
 
-        def self.column_names
-          %w[a_field b_field]
-        end
+        klass.new
       end
-
-      let(:model) { InvalidStubModel.new }
 
       it "fails" do
         expect(model).to_not be_valid_anonymisation
@@ -106,13 +110,13 @@ RSpec.describe Anony::Anonymisable do
     before { Anony::Config.ignore_fields(:id) }
 
     it "throws an exception" do
-      class InvalidStubModel
+      klass = Class.new do
         include Anony::Anonymisable
 
         attr_accessor :id
       end
 
-      expect { InvalidStubModel.anonymise { ignore :id } }.to raise_error(
+      expect { klass.anonymise { ignore :id } }.to raise_error(
         ArgumentError, "Cannot ignore [:id] (fields already ignored in Anony::Config)"
       )
     end
@@ -135,36 +139,40 @@ RSpec.describe Anony::Anonymisable do
   end
 
   context "with two models" do
-    class AClass
-      include Anony::Anonymisable
-      attr_accessor :a_field
+    let(:a_class) do
+      Class.new do
+        include Anony::Anonymisable
+        attr_accessor :a_field
 
-      anonymise do
-        with_strategy StubAnoynmiser, :a_field
-      end
+        anonymise do
+          with_strategy StubAnoynmiser, :a_field
+        end
 
-      def self.column_names
-        %w[a_field]
+        def self.column_names
+          %w[a_field]
+        end
       end
     end
 
-    class BClass
-      include Anony::Anonymisable
-      attr_accessor :b_field
+    let(:b_class) do
+      Class.new do
+        include Anony::Anonymisable
+        attr_accessor :b_field
 
-      anonymise do
-        with_strategy StubAnoynmiser, :b_field
-      end
+        anonymise do
+          with_strategy StubAnoynmiser, :b_field
+        end
 
-      def self.column_names
-        %w[b_field]
+        def self.column_names
+          %w[b_field]
+        end
       end
     end
 
     it "models do not leak configuration" do
       #  We had a case where these leaked, so we want to explicitly test it.
-      expect(AClass.anonymisable_fields).to match(a_field: anything)
-      expect(BClass.anonymisable_fields).to match(b_field: anything)
+      expect(a_class.anonymisable_fields).to match(a_field: anything)
+      expect(b_class.anonymisable_fields).to match(b_field: anything)
     end
   end
 
