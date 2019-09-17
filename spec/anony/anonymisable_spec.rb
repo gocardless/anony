@@ -106,6 +106,29 @@ RSpec.describe Anony::Anonymisable do
     end
   end
 
+  context "no anonymise block" do
+    describe "#valid_anonymisation?" do
+      let(:model) do
+        klass = Class.new do
+          include Anony::Anonymisable
+
+          attr_accessor :a_field
+          attr_accessor :b_field
+
+          def self.column_names
+            %w[a_field b_field]
+          end
+        end
+
+        klass.new
+      end
+
+      it "fails" do
+        expect(model).to_not be_valid_anonymisation
+      end
+    end
+  end
+
   context "with ignored fields in Anony::Config" do
     around do |example|
       original_ignores = Anony::Config.ignores

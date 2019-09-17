@@ -57,6 +57,10 @@ module Anony
       end
     end
 
+    included do
+      @anonymisable_fields = {}
+    end
+
     def anonymise_field(field)
       raise FieldException, field unless self.class.anonymisable_fields.key?(field)
 
