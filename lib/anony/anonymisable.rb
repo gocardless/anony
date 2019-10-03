@@ -6,9 +6,10 @@ module Anony
   class AnonymisableConfig
     def initialize
       @anonymisable_fields = {}
+      @destroy_on_anonymise = false
     end
 
-    attr_reader :anonymisable_fields
+    attr_reader :anonymisable_fields, :destroy_on_anonymise
 
     def with_strategy(strategy, *fields, &block)
       unless strategy.respond_to?(:call)
@@ -18,6 +19,10 @@ module Anony
 
       raise ArgumentError, "Block or Strategy object required" unless strategy
       raise ArgumentError, "One or more fields required" unless fields.any?
+
+      if destroy_on_anonymise
+        raise ArgumentError, "Can't specify destroy and strategies for fields"
+      end
 
       fields.each { |field| anonymisable_fields[field] = strategy }
     end
@@ -44,6 +49,14 @@ module Anony
 
       with_strategy(NoOp, *fields)
     end
+
+    def destroy
+      unless anonymisable_fields.empty?
+        raise ArgumentError, "Can't specify destroy and strategies for fields"
+      end
+
+      @destroy_on_anonymise = true
+    end
   end
 
   module Anonymisable
@@ -58,22 +71,26 @@ module Anony
         @anonymiser ||= AnonymisableConfig.new
       end
 
-      delegate :anonymisable_fields, to: :anonymiser
+      delegate :anonymisable_fields, :destroy_on_anonymise, to: :anonymiser
     end
 
     def anonymise!
       raise FieldException, unhandled_fields unless valid_anonymisation?
 
-      self.class.anonymisable_fields.each do |field, _|
-        anonymise_field(field)
-      end
+      if self.class.destroy_on_anonymise
+        destroy!
+      else
+        self.class.anonymisable_fields.each do |field, _|
+          anonymise_field(field)
+        end
 
-      save!
+        save!
+      end
     end
 
     #  VALIDATION.
     def valid_anonymisation?
-      unhandled_fields.empty?
+      self.class.destroy_on_anonymise || unhandled_fields.empty?
     end
 
     private def unhandled_fields

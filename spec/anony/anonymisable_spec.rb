@@ -77,6 +77,40 @@ RSpec.describe Anony::Anonymisable do
     end
   end
 
+  context "destroy on anonymise" do
+    let(:model) do
+      klass = Class.new do
+        include Anony::Anonymisable
+
+        attr_accessor :a_field
+
+        anonymise do
+          destroy
+        end
+
+        def destroy!
+          true
+        end
+      end
+
+      klass.new
+    end
+
+    describe "#anonymise!" do
+      it "destroys the model" do
+        expect(model).to receive(:destroy!)
+
+        model.anonymise!
+      end
+    end
+
+    describe "#valid_anonymisation?" do
+      it "is valid" do
+        expect(model).to be_valid_anonymisation
+      end
+    end
+  end
+
   context "invalid model anonymisation" do
     describe "#valid_anonymisation?" do
       let(:model) do
@@ -124,6 +158,42 @@ RSpec.describe Anony::Anonymisable do
       it "fails" do
         expect(model).to_not be_valid_anonymisation
       end
+    end
+  end
+
+  context "when a strategy is specified after destroy" do
+    it "throws an exception" do
+      klass = Class.new do
+        include Anony::Anonymisable
+
+        attr_accessor :a_field
+
+        anonymise do
+          destroy
+        end
+      end
+
+      expect { klass.anonymise { nilable :a_field } }.to raise_error(
+        ArgumentError, "Can't specify destroy and strategies for fields"
+      )
+    end
+  end
+
+  context "when a strategy is specified before destroy" do
+    it "throws an exception" do
+      klass = Class.new do
+        include Anony::Anonymisable
+
+        attr_accessor :a_field
+
+        anonymise do
+          nilable :a_field
+        end
+      end
+
+      expect { klass.anonymise { destroy } }.to raise_error(
+        ArgumentError, "Can't specify destroy and strategies for fields"
+      )
     end
   end
 
