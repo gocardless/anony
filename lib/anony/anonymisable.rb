@@ -4,6 +4,12 @@ require "active_support/concern"
 
 module Anony
   class AnonymisableConfig
+    def initialize
+      @anonymisable_fields = {}
+    end
+
+    attr_reader :anonymisable_fields
+
     def with_strategy(strategy, *fields, &block)
       unless strategy.respond_to?(:call)
         fields.unshift(strategy)
@@ -26,10 +32,6 @@ module Anony
 
     def nilable(*fields)
       with_strategy(Nilable, *fields)
-    end
-
-    def anonymisable_fields
-      @anonymisable_fields ||= {}
     end
 
     def ignore(*fields)
