@@ -33,6 +33,10 @@ RSpec.describe Anony::Anonymisable do
         def write_attribute(field, value)
           send("#{field}=", value)
         end
+
+        def save!
+          true
+        end
       end
 
       klass.new
@@ -45,16 +49,22 @@ RSpec.describe Anony::Anonymisable do
       model.d_field = double
     end
 
-    describe "#anonymise" do
+    describe "#anonymise!" do
       it "anoynmises fields" do
-        expect { model.anonymise }.
+        expect { model.anonymise! }.
           to change(model, :a_field).to("OVERWRITTEN DATA").
           and change(model, :b_field).to("cba")
       end
 
+      it "saves the model" do
+        expect(model).to receive(:save!)
+
+        model.anonymise!
+      end
+
       context "`do_not_anonymise` fields" do
-        it { expect { model.anonymise }.to_not change(model, :c_field) }
-        it { expect { model.anonymise }.to_not change(model, :d_field) }
+        it { expect { model.anonymise! }.to_not change(model, :c_field) }
+        it { expect { model.anonymise! }.to_not change(model, :d_field) }
       end
     end
 
@@ -256,6 +266,10 @@ RSpec.describe Anony::Anonymisable do
         def write_attribute(field, value)
           send("#{field}=", value)
         end
+
+        def save!
+          true
+        end
       end
 
       klass.new
@@ -272,7 +286,7 @@ RSpec.describe Anony::Anonymisable do
       expect_any_instance_of(Anony::OverwriteHex).to receive(:call).with("bar")
       expect(Anony::AnonymisedEmail).to receive(:call).with("baz")
 
-      model.anonymise
+      model.anonymise!
     end
   end
 end

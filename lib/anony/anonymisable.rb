@@ -61,14 +61,14 @@ module Anony
       @anonymisable_fields = {}
     end
 
-    def anonymise
+    def anonymise!
       raise FieldException, unhandled_fields unless valid_anonymisation?
 
       self.class.anonymisable_fields.each do |field, _|
         anonymise_field(field)
       end
 
-      self
+      save!
     end
 
     #  VALIDATION.
