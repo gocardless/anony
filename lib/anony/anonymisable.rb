@@ -48,17 +48,15 @@ module Anony
     extend ActiveSupport::Concern
 
     class_methods do
-      attr_reader :anonymisable_fields
-
       def anonymise(&block)
-        anonymiser = AnonymisableConfig.new
         anonymiser.instance_eval(&block)
-        @anonymisable_fields = anonymiser.anonymisable_fields
       end
-    end
 
-    included do
-      @anonymisable_fields = {}
+      def anonymiser
+        @anonymiser ||= AnonymisableConfig.new
+      end
+
+      delegate :anonymisable_fields, to: :anonymiser
     end
 
     def anonymise!
