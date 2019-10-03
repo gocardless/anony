@@ -45,18 +45,6 @@ RSpec.describe Anony::Anonymisable do
       model.d_field = double
     end
 
-    describe "#anonymise_field" do
-      it "anonymises field `a`" do
-        model.anonymise_field(:a_field)
-        expect(model.a_field).to eq("OVERWRITTEN DATA")
-      end
-
-      it "raises on invalid fields" do
-        expect { model.anonymise_field(:not_a_field) }.
-          to raise_error(Anony::FieldException)
-      end
-    end
-
     describe "#anonymise" do
       it "anoynmises fields" do
         expect { model.anonymise }.

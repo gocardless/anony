@@ -61,16 +61,6 @@ module Anony
       @anonymisable_fields = {}
     end
 
-    def anonymise_field(field)
-      raise FieldException, field unless self.class.anonymisable_fields.key?(field)
-
-      strategy = self.class.anonymisable_fields.fetch(field)
-      current_value = read_attribute(field)
-      anonymised_value = strategy.call(current_value)
-
-      write_attribute(field, anonymised_value)
-    end
-
     def anonymise
       raise FieldException, unhandled_fields unless valid_anonymisation?
 
@@ -92,6 +82,16 @@ module Anony
       handled_fields = self.class.anonymisable_fields.map { |k, _| k }
 
       anonymisable_columns - handled_fields
+    end
+
+    private def anonymise_field(field)
+      raise FieldException, field unless self.class.anonymisable_fields.key?(field)
+
+      strategy = self.class.anonymisable_fields.fetch(field)
+      current_value = read_attribute(field)
+      anonymised_value = strategy.call(current_value)
+
+      write_attribute(field, anonymised_value)
     end
   end
 end
