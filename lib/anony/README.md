@@ -24,11 +24,11 @@ end
 employee = Employee.find(1)
  => #≤Employee id="1" first_name="Alice" middle_name="in">
 
-employee.anonymise
- => #≤Employee id="1" first_name="bf2eb0fec2ac" middle_name=nil>
-
-employee.save!
+employee.anonymise!
  => true
+
+employee
+ => #≤Employee id="1" first_name="bf2eb0fec2ac" middle_name=nil>
 ```
 
 Anony defines some common strategies internally, but you can also write your own - they
@@ -53,11 +53,11 @@ end
 manager = Manager.first
  => #<Manager id=42>
 
-manager.anonymise
- => #<Manager id="e9ab2800-d4b9-4227-94a7-7f81118d8a8a">
-
-manager.save!
+manager.anonymise!
  => true
+
+manager
+ => #<Manager id="e9ab2800-d4b9-4227-94a7-7f81118d8a8a">
 ```
 
 It's possible to ignore some common columns using configuration. For example, in Rails
@@ -75,6 +75,27 @@ fields like so:
 Anony::Config.ignore_fields(:id, :created_at, :updated_at)
 ```
 
+There are some models which should be destroyed as part of anonymisation.  This can be done using the `destroy` method:
+
+```ruby
+class Temporary < ApplicationRecord
+  include Anony::Anonymisable
+
+  anonymise do
+    destroy
+  end
+end
+
+temporary = Temporary.first
+ => #<Temporary id=42>
+
+temporary.anonymise!
+ => true
+
+temporary.persisted?
+ => false
+```
+
 ## Testing
 
 Anony exposes an instance method called `#valid_anonymisation?` which is called before
@@ -86,7 +107,7 @@ RSpec.describe Employee do
   subject { described_class.new }
 
   it { is_expected.to be_valid_anonymisation }
-  specify { expect(subject.anonymise).to be_valid }
+  specify { expect(subject.anonymise!).to eq(true) }
 end
 ```
 ## Future ideas
