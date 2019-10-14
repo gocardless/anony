@@ -35,6 +35,10 @@ module Anony
       with_strategy(AnonymisedEmail, *fields)
     end
 
+    def phone_number(*fields)
+      with_strategy(AnonymisedPhoneNumber, *fields)
+    end
+
     def nilable(*fields)
       with_strategy(Nilable, *fields)
     end
