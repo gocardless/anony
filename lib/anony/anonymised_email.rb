@@ -5,7 +5,7 @@ require "securerandom"
 module Anony
   module AnonymisedEmail
     def self.call(_value)
-      "anonymous+#{SecureRandom.uuid}@example.com"
+      Anony::Config.email_template % SecureRandom.uuid
     end
   end
 end
