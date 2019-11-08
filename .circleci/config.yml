@@ -1,0 +1,36 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: ruby:2.6
+    steps:
+      - checkout
+
+      - type: cache-restore
+        key: anony-bundler-{{ checksum "anony.gemspec" }}
+
+      - run: gem install bundler -v 2.0.2
+      - run: bundle install --path vendor/bundle
+
+      - type: cache-save
+        key: anony-bundler-{{ checksum "anony.gemspec" }}
+        paths:
+          - vendor/bundle
+
+      - type: shell
+        command: |
+          bundle exec rspec --profile 10 \
+                            --format RspecJunitFormatter \
+                            --out /tmp/test-results/rspec.xml \
+                            --format progress \
+                            spec
+
+      - type: store_test_results
+        path: /tmp/test-results
+
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - build
