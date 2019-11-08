@@ -3,7 +3,7 @@
 require "spec_helper"
 require "rubocop"
 require "rubocop/rspec/cop_helper"
-require_relative "../../../config/cops/define_deletion_strategy"
+require "anony/cops/define_deletion_strategy"
 
 RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
   include CopHelper

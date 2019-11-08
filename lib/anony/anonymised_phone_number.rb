@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "prius"
-
 module Anony
   module AnonymisedPhoneNumber
     def self.call(_value)
