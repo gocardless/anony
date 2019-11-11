@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require "rubocop"
+
+require_relative "../version.rb"
+
 module RuboCop
   module Cop
     module Lint
@@ -20,7 +24,7 @@ module RuboCop
       # class MyNewThing < ApplicationRecord; end
       class DefineDeletionStrategy < Cop
         MSG = "Define .anonymise for %<model>s, see https://github.com/gocardless/" \
-              "anony/blob/#{::Anony::VERSION}/README.md for details"
+              "anony/blob/#{Anony::VERSION}/README.md for details"
 
         def_node_matcher :only_models, <<~PATTERN
           (class
