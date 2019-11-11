@@ -1,3 +1,7 @@
+# v0.2.1
+
+* Fix relative require in DefineDeletionStrategy cop [#8](https://github.com/gocardless/anony/pull/8)
+
 # v0.2
 
 * Improve the README [#5](https://github.com/gocardless/anony/pulls/5)
