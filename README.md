@@ -158,6 +158,39 @@ RSpec.describe Employee do
 end
 ```
 
+This library ships with a set of useful RSpec examples for your specs. Just require them
+somewhere before running your spec:
+
+```ruby
+require "anony/rspec_shared_examples"
+```
+
+```ruby
+# spec/models/employee_spec.rb
+
+RSpec.describe Employee do
+  # We use FactoryBot at GoCardless but however you setup a model instance is fine
+  subject { FactoryBot.build(:employee) }
+
+  # If you just anonymise fields normally
+  it_behaves_like "anonymisable model"
+
+  # OR, if you anonymise by destroying the record
+  it_behaves_like "anonymisable model with destruction"
+end
+```
+
+You can also override the subject inside the shared example if it helps (e.g. if you need
+to persist the record before anonymising it):
+
+```ruby
+RSpec.describe Employee do
+  it_behaves_like "anonymisable model with destruction" do
+    subject { FactoryBot.create(:employee) }
+  end
+end
+```
+
 ## Integration with Rubocop
 
 This library includes some Rubocops to ensure consistency in your codebase. Just add the
