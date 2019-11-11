@@ -69,7 +69,8 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
 
     it "has the correct message" do
       expect(offenses.first.message).
-        to eq("Define .anonymise for Employee, see ./lib/anony/README.md for details")
+        to eq("Define .anonymise for Employee, see https://github.com/gocardless/anony/" \
+              "blob/#{Anony::VERSION}/README.md for details")
     end
   end
 end

@@ -4,9 +4,7 @@ module RuboCop
   module Cop
     module Lint
       # This cop checks whether an ActiveRecord model implements the `.anonymise`
-      # preference (from the Anony library).
-      #
-      # For data deletion purposes, this will be mandatory going forwards.
+      # preference (using the Anony gem).
       #
       # @example
       #
@@ -21,7 +19,8 @@ module RuboCop
       # # bad
       # class MyNewThing < ApplicationRecord; end
       class DefineDeletionStrategy < Cop
-        MSG = "Define .anonymise for %<model>s, see ./lib/anony/README.md for details"
+        MSG = "Define .anonymise for %<model>s, see https://github.com/gocardless/" \
+              "anony/blob/#{::Anony::VERSION}/README.md for details"
 
         def_node_matcher :only_models, <<~PATTERN
           (class
