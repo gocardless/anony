@@ -4,10 +4,12 @@ require "spec_helper"
 
 RSpec.describe Anony::Config do
   around do |example|
-    original_ignores = described_class.ignores
-    example.call
-  ensure
-    described_class.ignores = original_ignores
+    begin
+      original_ignores = described_class.ignores
+      example.call
+    ensure
+      described_class.ignores = original_ignores
+    end
   end
 
   describe ".ignore?" do

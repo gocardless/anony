@@ -52,6 +52,8 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
   end
 
   context "when a model does not define anonymisation rules" do
+    subject(:offenses) { cop.offenses }
+
     let(:source) do
       <<~RUBY
         class Employee < ApplicationRecord
@@ -59,10 +61,14 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
       RUBY
     end
 
-    it "registers an offense" do
-      expect(cop.offenses.count).to eq(1)
-      expect(cop.offenses.first.cop_name).to eq(cop.name)
-      expect(cop.offenses.first.message).
+    it { expect(offenses.count).to eq(1) }
+
+    it "has the correct name" do
+      expect(offenses.first.cop_name).to eq(cop.name)
+    end
+
+    it "has the correct message" do
+      expect(offenses.first.message).
         to eq("Define .anonymise for Employee, see ./lib/anony/README.md for details")
     end
   end
