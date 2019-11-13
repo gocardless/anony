@@ -73,6 +73,11 @@ module Anony
 
     class_methods do
       def anonymise(&block)
+        # Automatically update :anonymised_at column if it exists (can be overridden)
+        if column_names.include?("anonymised_at")
+          anonymiser.current_datetime(:anonymised_at)
+        end
+
         anonymiser.instance_eval(&block)
       end
 
