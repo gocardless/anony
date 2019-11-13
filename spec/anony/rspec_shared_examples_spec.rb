@@ -10,12 +10,12 @@ RSpec.describe "RSpec shared examples" do
 
       attr_accessor :a_field
 
-      anonymise do
-        hex :a_field
-      end
-
       def self.column_names
         %w[a_field]
+      end
+
+      anonymise do
+        hex :a_field
       end
 
       alias_method :read_attribute, :send
@@ -38,11 +38,11 @@ RSpec.describe "RSpec shared examples" do
       Class.new do
         include Anony::Anonymisable
 
-        anonymise { destroy }
-
         def self.column_names
           %w[a_field]
         end
+
+        anonymise { destroy }
 
         alias_method :read_attribute, :send
         def write_attribute(field, value)

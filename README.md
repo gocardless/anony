@@ -59,8 +59,20 @@ employee
  => #≤Employee id="1" first_name="bf2eb0fec2ac" middle_name=nil>
 ```
 
+The default strategies include:
+
+* **nilable**, overwrites the field with `nil`
+* **hex**, overwrites the field with random hexadecimal characters
+* **email**, overwrites the field with a configured email (see
+  [Configuration](#configuration))
+* **phone_number**, overwrites the field with a configured phone number (see
+  [Configuration](#configuration))
+* **current_datetime**, overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
+
+### Custom strategies
+
 Anony defines some common strategies internally, but you can also write your own - they
-just need to be objects which conform to the `.call(existing_value)` signature:
+just need to be Ruby objects which conform to the `.call(existing_value)` signature (blocks can also be used dynamically):
 
 ```ruby
 module OverwriteUUID
@@ -78,6 +90,7 @@ class Manager < ApplicationRecord
 
   anonymise do
     with_strategy OverwriteUUID, :id
+    # block syntax is also supported
     with_strategy(:first_name) { |name| Digest::SHA2.hexdigest(name) }
   end
 end
@@ -92,8 +105,53 @@ manager
  => #<Manager id="e9ab2800-d4b9-4227-94a7-7f81118d8a8a">
 ```
 
-There are some models which should be destroyed as part of anonymisation. This can be done
-using the `destroy` method:
+### Identifying anonymised records
+
+If your model has an `anonymised_at` column, we will automatically set that value when
+calling `#anonymise!` (similar to how Rails will modify the `updated_at` timestamp). This
+means you could automatically filter out anonymised records without matching on the
+anonymised values.
+
+Here is an example of adding this column with new tables:
+
+```ruby
+# When creating the new table:
+
+class AddEmployees < ActiveRecord::Migration[6.0]
+  def change
+    create_table(:employees) do |t|
+      # ... the rest of your columns
+      t.column :anonymised_at, :datetime, null: true
+    end
+  end
+end
+```
+
+Here is an example of adding this column to an existing table:
+
+```ruby
+class AddAnonymisedAtToEmployees < ActiveRecord::Migration[6.0]
+  def change
+    add_column(:employees, :anonymised_at, :datetime, null: true)
+  end
+end
+```
+
+You can exclude yourself from this feature if you define a different anonymisation
+strategy for this column, e.g.:
+
+```ruby
+class Employee
+  anonymise do
+    ignore :anonymised_at
+  end
+end
+```
+
+### Destroying instead of anonymising
+
+There are some models which should be destroyed as part of anonymisation (because when
+anonymised they bring no value). This can be done using the `destroy` method:
 
 ```ruby
 class Temporary < ApplicationRecord
@@ -113,6 +171,8 @@ temporary.anonymise!
 temporary.persisted?
  => false
 ```
+
+Note that it isn't possible to define both anonymisation rules and destruction.
 
 ## Configuration
 

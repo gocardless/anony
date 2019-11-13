@@ -1,3 +1,7 @@
+# v0.3.0
+
+* Support `anonymised_at` column [#9](https://github.com/gocardless/anony/pull/9)
+
 # v0.2.1
 
 * Fix relative require in DefineDeletionStrategy cop [#8](https://github.com/gocardless/anony/pull/8)
