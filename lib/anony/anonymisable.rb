@@ -44,6 +44,10 @@ module Anony
       with_strategy(Nilable, *fields)
     end
 
+    def current_datetime(*fields)
+      with_strategy(CurrentDatetime, *fields)
+    end
+
     def ignore(*fields)
       already_ignored = fields.select { |field| Config.ignore?(field) }
 

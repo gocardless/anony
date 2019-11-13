@@ -67,6 +67,7 @@ The default strategies include:
   [Configuration](#configuration))
 * **phone_number**, overwrites the field with a configured phone number (see
   [Configuration](#configuration))
+* **current_datetime**, overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
 
 ### Custom strategies
 
