@@ -104,6 +104,49 @@ manager
  => #<Manager id="e9ab2800-d4b9-4227-94a7-7f81118d8a8a">
 ```
 
+### Identifying anonymised records
+
+If your model has an `anonymised_at` column, we will automatically set that value when
+calling `#anonymise!` (similar to how Rails will modify the `updated_at` timestamp). This
+means you could automatically filter out anonymised records without matching on the
+anonymised values.
+
+Here is an example of adding this column with new tables:
+
+```ruby
+# When creating the new table:
+
+class AddEmployees < ActiveRecord::Migration[6.0]
+  def change
+    create_table(:employees) do |t|
+      # ... the rest of your columns
+      t.column :anonymised_at, :datetime, null: true
+    end
+  end
+end
+```
+
+Here is an example of adding this column to an existing table:
+
+```ruby
+class AddAnonymisedAtToEmployees < ActiveRecord::Migration[6.0]
+  def change
+    add_column(:employees, :anonymised_at, :datetime, null: true)
+  end
+end
+```
+
+You can exclude yourself from this feature if you define a different anonymisation
+strategy for this column, e.g.:
+
+```ruby
+class Employee
+  anonymise do
+    ignore :anonymised_at
+  end
+end
+```
+
 ### Destroying instead of anonymising
 
 There are some models which should be destroyed as part of anonymisation (because when
