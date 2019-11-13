@@ -29,23 +29,23 @@ module Anony
     end
 
     def hex(*fields, max_length: 36)
-      with_strategy(OverwriteHex.new(max_length), *fields)
+      with_strategy(Strategies::OverwriteHex.new(max_length), *fields)
     end
 
     def email(*fields)
-      with_strategy(AnonymisedEmail, *fields)
+      with_strategy(Strategies::AnonymisedEmail, *fields)
     end
 
     def phone_number(*fields)
-      with_strategy(AnonymisedPhoneNumber, *fields)
+      with_strategy(Strategies::AnonymisedPhoneNumber, *fields)
     end
 
     def nilable(*fields)
-      with_strategy(Nilable, *fields)
+      with_strategy(Strategies::Nilable, *fields)
     end
 
     def current_datetime(*fields)
-      with_strategy(CurrentDatetime, *fields)
+      with_strategy(Strategies::CurrentDatetime, *fields)
     end
 
     def ignore(*fields)
@@ -56,7 +56,7 @@ module Anony
                              "(fields already ignored in Anony::Config)"
       end
 
-      with_strategy(NoOp, *fields)
+      with_strategy(Strategies::NoOp, *fields)
     end
 
     def destroy

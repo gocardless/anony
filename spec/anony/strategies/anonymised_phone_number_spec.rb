@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::AnonymisedPhoneNumber do
+RSpec.describe Anony::Strategies::AnonymisedPhoneNumber do
   describe ".call" do
     subject(:result) { described_class.call(value) }
 

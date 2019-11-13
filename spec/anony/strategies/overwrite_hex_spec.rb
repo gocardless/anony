@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::OverwriteHex do
+RSpec.describe Anony::Strategies::OverwriteHex do
   describe ".call" do
     subject(:result) { described_class.new(36).call(value) }
 
