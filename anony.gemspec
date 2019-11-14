@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 2.0.2"
-  spec.add_development_dependency "gc_ruboconfig", "~> 2.6.1"
+  spec.add_development_dependency "gc_ruboconfig", "~> 2.7.0"
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "rspec_junit_formatter", "~> 0.4"
   spec.add_development_dependency "rubocop", "~> 0.76"
