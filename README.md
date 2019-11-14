@@ -150,17 +150,6 @@ class AddAnonymisedAtToEmployees < ActiveRecord::Migration[6.0]
 end
 ```
 
-You can exclude yourself from this feature if you define a different anonymisation
-strategy for this column, e.g.:
-
-```ruby
-class Employee
-  anonymise do
-    ignore :anonymised_at
-  end
-end
-```
-
 ### Destroying instead of anonymising
 
 There are some models which should be destroyed as part of anonymisation (because when

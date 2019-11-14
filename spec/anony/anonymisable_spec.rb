@@ -20,16 +20,16 @@ RSpec.describe Anony::Anonymisable do
         attr_accessor :ignore_one
         attr_accessor :ignore_two
 
-        def self.column_names
-          %w[a_field b_field c_field ignore_one ignore_two]
-        end
-
         anonymise do
           with_strategy StubAnoynmiser, :a_field
           with_strategy(:b_field) { |v, _| v.reverse }
           with_strategy(:c_field) { some_instance_method? ? "yes" : "no" }
 
           ignore :ignore_one, :ignore_two
+        end
+
+        def self.column_names
+          %w[a_field b_field c_field ignore_one ignore_two]
         end
 
         alias_method :read_attribute, :send
@@ -92,10 +92,6 @@ RSpec.describe Anony::Anonymisable do
 
         attr_accessor :a_field
 
-        def self.column_names
-          %w[a_field]
-        end
-
         anonymise do
           destroy
         end
@@ -132,12 +128,12 @@ RSpec.describe Anony::Anonymisable do
           attr_accessor :a_field
           attr_accessor :b_field
 
-          def self.column_names
-            %w[a_field b_field]
-          end
-
           anonymise do
             with_strategy StubAnoynmiser, :a_field
+          end
+
+          def self.column_names
+            %w[a_field b_field]
           end
         end
 
@@ -180,10 +176,6 @@ RSpec.describe Anony::Anonymisable do
 
         attr_accessor :a_field
 
-        def self.column_names
-          %w[a_field]
-        end
-
         anonymise do
           destroy
         end
@@ -201,10 +193,6 @@ RSpec.describe Anony::Anonymisable do
         include Anony::Anonymisable
 
         attr_accessor :a_field
-
-        def self.column_names
-          %w[a_field]
-        end
 
         anonymise do
           nilable :a_field
@@ -224,12 +212,12 @@ RSpec.describe Anony::Anonymisable do
 
         attr_accessor :a_field, :anonymised_at
 
-        def self.column_names
-          %w[a_field anonymised_at]
-        end
-
         anonymise do
           nilable :a_field
+        end
+
+        def self.column_names
+          %w[a_field anonymised_at]
         end
 
         alias_method :read_attribute, :send
@@ -254,17 +242,6 @@ RSpec.describe Anony::Anonymisable do
         from(nil).
         to be_within(1).of(Time.now)
     end
-
-    context "and overridden" do
-      before do
-        klass.anonymise { ignore(:anonymised_at) }
-      end
-
-      it "ignores the column as requested" do
-        model = klass.new
-        expect { model.anonymise! }.to_not(change { model.anonymised_at })
-      end
-    end
   end
 
   context "with ignored fields in Anony::Config" do
@@ -283,10 +260,6 @@ RSpec.describe Anony::Anonymisable do
       klass = Class.new do
         include Anony::Anonymisable
 
-        def self.column_names
-          []
-        end
-
         attr_accessor :id
       end
 
@@ -301,11 +274,11 @@ RSpec.describe Anony::Anonymisable do
 
         attr_accessor :id, :name
 
+        anonymise { with_strategy(StubAnoynmiser, :name) }
+
         def self.column_names
           %w[id name]
         end
-
-        anonymise { with_strategy(StubAnoynmiser, :name) }
       end
 
       expect(klass.new).to be_valid_anonymisation
@@ -318,12 +291,12 @@ RSpec.describe Anony::Anonymisable do
         include Anony::Anonymisable
         attr_accessor :a_field
 
-        def self.column_names
-          %w[a_field]
-        end
-
         anonymise do
           with_strategy StubAnoynmiser, :a_field
+        end
+
+        def self.column_names
+          %w[a_field]
         end
       end
     end
@@ -333,12 +306,12 @@ RSpec.describe Anony::Anonymisable do
         include Anony::Anonymisable
         attr_accessor :b_field
 
-        def self.column_names
-          %w[b_field]
-        end
-
         anonymise do
           with_strategy StubAnoynmiser, :b_field
+        end
+
+        def self.column_names
+          %w[b_field]
         end
       end
     end
