@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::AnonymisedEmail do
+RSpec.describe Anony::Strategies::AnonymisedEmail do
   describe ".call" do
     subject(:result) { described_class.call(value) }
 

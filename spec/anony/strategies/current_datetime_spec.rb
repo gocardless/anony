@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::CurrentDatetime do
+RSpec.describe Anony::Strategies::CurrentDatetime do
   subject(:result) { described_class.call(value) }
 
   let(:value) { "old value" }

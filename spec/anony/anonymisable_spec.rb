@@ -424,11 +424,12 @@ RSpec.describe Anony::Anonymisable do
     end
 
     it "calls the relevant anonymisers" do
-      expect(Anony::Nilable).to receive(:call).with("foo")
-      expect_any_instance_of(Anony::OverwriteHex).to receive(:call).with("bar")
-      expect(Anony::AnonymisedEmail).to receive(:call).with("baz")
-      expect(Anony::AnonymisedPhoneNumber).to receive(:call).with("qux")
-      expect(Anony::CurrentDatetime).to receive(:call).with("qax")
+      expect(Anony::Strategies::Nilable).to receive(:call).with("foo")
+      expect(Anony::Strategies::AnonymisedEmail).to receive(:call).with("baz")
+      expect(Anony::Strategies::AnonymisedPhoneNumber).to receive(:call).with("qux")
+      expect(Anony::Strategies::CurrentDatetime).to receive(:call).with("qax")
+      expect_any_instance_of(Anony::Strategies::OverwriteHex).
+        to receive(:call).with("bar")
 
       model.anonymise!
     end

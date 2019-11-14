@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::Nilable do
+RSpec.describe Anony::Strategies::Nilable do
   describe ".call" do
     subject(:result) { described_class.call(value) }
 
