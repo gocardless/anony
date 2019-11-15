@@ -18,6 +18,8 @@ module Anony
         strategy = block
       end
 
+      fields = fields.flatten
+
       raise ArgumentError, "Block or Strategy object required" unless strategy
       raise ArgumentError, "One or more fields required" unless fields.any?
 

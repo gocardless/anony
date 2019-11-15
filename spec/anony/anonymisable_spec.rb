@@ -344,6 +344,10 @@ RSpec.describe Anony::Anonymisable do
       end
     end
 
+    it "with an array of fields and no block / strategy" do
+      expect { config.with_strategy(%i[foo bar]) }.to raise_error(ArgumentError)
+    end
+
     context "two arguments" do
       it "registers the field to the strategy" do
         config.with_strategy(StubAnoynmiser, :field)
@@ -352,6 +356,17 @@ RSpec.describe Anony::Anonymisable do
 
       it "with a block" do
         config.with_strategy(:foo, :bar) { |v| v }
+        expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
+      end
+
+      it "with a strategy and an array of fields" do
+        config.with_strategy(StubAnoynmiser, %i[foo bar])
+        expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
+        expect(config.anonymisable_fields.values).to all(eq(StubAnoynmiser))
+      end
+
+      it "with a block and an array of fields" do
+        config.with_strategy(%i[foo bar]) { |v| v }
         expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
       end
     end
