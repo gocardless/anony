@@ -369,7 +369,7 @@ RSpec.describe Anony::Anonymisable do
       klass = Class.new do
         include Anony::Anonymisable
 
-        attr_accessor :null, :hexy, :mailo, :phone_numba, :started_at
+        attr_accessor :null, :hexy, :mailo, :phone_numba, :started_at, :konstant
 
         def self.column_names
           %w[null hexy mailo phone_numba started_at]
@@ -381,6 +381,7 @@ RSpec.describe Anony::Anonymisable do
           email :mailo
           phone_number :phone_numba
           current_datetime :started_at
+          with_value 123, :konstant
         end
 
         alias_method :read_attribute, :send
@@ -402,6 +403,7 @@ RSpec.describe Anony::Anonymisable do
       model.mailo = "baz"
       model.phone_numba = "qux"
       model.started_at = "qax"
+      model.konstant = "fax"
     end
 
     it "calls the relevant anonymisers" do
@@ -411,6 +413,8 @@ RSpec.describe Anony::Anonymisable do
       expect(Anony::Strategies::CurrentDatetime).to receive(:call).with("qax")
       expect_any_instance_of(Anony::Strategies::OverwriteHex).
         to receive(:call).with("bar")
+      expect_any_instance_of(Anony::Strategies::Constant).
+        to receive(:call).with("fax")
 
       model.anonymise!
     end

@@ -62,6 +62,7 @@ employee
 The default strategies include:
 
 * **nilable**, overwrites the field with `nil`
+* **with_value**, overwrites the field with a constant value
 * **hex**, overwrites the field with random hexadecimal characters
 * **email**, overwrites the field with a configured email (see
   [Configuration](#configuration))

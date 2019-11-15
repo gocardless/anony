@@ -28,6 +28,10 @@ module Anony
       fields.each { |field| anonymisable_fields[field] = strategy }
     end
 
+    def with_value(value, *fields)
+      with_strategy(Strategies::Constant.new(value), *fields)
+    end
+
     def hex(*fields, max_length: 36)
       with_strategy(Strategies::OverwriteHex.new(max_length), *fields)
     end
