@@ -72,7 +72,7 @@ The default strategies include:
 ### Custom strategies
 
 Anony defines some common strategies internally, but you can also write your own - they
-just need to be Ruby objects which conform to the `.call(existing_value)` signature (blocks can also be used dynamically):
+just need to be Ruby objects which conform to the `.call(existing_value)` signature:
 
 ```ruby
 module OverwriteUUID
@@ -90,8 +90,21 @@ class Manager < ApplicationRecord
 
   anonymise do
     with_strategy OverwriteUUID, :id
-    # block syntax is also supported
+  end
+end
+```
+
+You can also use a block. Blocks are executed in the context of the model so they can
+access local properties & methods, and they take the existing value of the column as the
+only argument:
+
+```ruby
+class Employee < ApplicationRecord
+  include Anony::Anonymisable
+
+  anonymise do
     with_strategy(:first_name) { |name| Digest::SHA2.hexdigest(name) }
+    with_strategy(:last_name) { "previous-name-of-#{id}" }
   end
 end
 

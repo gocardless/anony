@@ -17,16 +17,19 @@ RSpec.describe Anony::Anonymisable do
         attr_accessor :a_field
         attr_accessor :b_field
         attr_accessor :c_field
-        attr_accessor :d_field
+        attr_accessor :ignore_one
+        attr_accessor :ignore_two
 
         def self.column_names
-          %w[a_field b_field c_field d_field]
+          %w[a_field b_field c_field ignore_one ignore_two]
         end
 
         anonymise do
           with_strategy StubAnoynmiser, :a_field
           with_strategy(:b_field) { |v, _| v.reverse }
-          ignore :c_field, :d_field
+          with_strategy(:c_field) { some_instance_method? ? "yes" : "no" }
+
+          ignore :ignore_one, :ignore_two
         end
 
         alias_method :read_attribute, :send
@@ -35,6 +38,10 @@ RSpec.describe Anony::Anonymisable do
         end
 
         def save!
+          true
+        end
+
+        def some_instance_method?
           true
         end
       end
@@ -46,14 +53,15 @@ RSpec.describe Anony::Anonymisable do
       model.a_field = double
       model.b_field = "abc"
       model.c_field = double
-      model.d_field = double
+      model.ignore_one = model.ignore_two = double
     end
 
     describe "#anonymise!" do
       it "anoynmises fields" do
         expect { model.anonymise! }.
           to change(model, :a_field).to("OVERWRITTEN DATA").
-          and change(model, :b_field).to("cba")
+          and change(model, :b_field).to("cba").
+          and change(model, :c_field).to("yes")
       end
 
       it "saves the model" do
@@ -62,9 +70,9 @@ RSpec.describe Anony::Anonymisable do
         model.anonymise!
       end
 
-      context "`do_not_anonymise` fields" do
-        it { expect { model.anonymise! }.to_not change(model, :c_field) }
-        it { expect { model.anonymise! }.to_not change(model, :d_field) }
+      context "ignored fields" do
+        it { expect { model.anonymise! }.to_not change(model, :ignore_one) }
+        it { expect { model.anonymise! }.to_not change(model, :ignore_two) }
       end
     end
 

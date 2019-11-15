@@ -120,7 +120,12 @@ module Anony
 
       strategy = self.class.anonymisable_fields.fetch(field)
       current_value = read_attribute(field)
-      anonymised_value = strategy.call(current_value)
+
+      anonymised_value = if strategy.is_a?(Proc)
+                           instance_exec(current_value, &strategy)
+                         else
+                           strategy.call(current_value)
+                         end
 
       write_attribute(field, anonymised_value)
     end
