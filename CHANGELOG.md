@@ -1,3 +1,7 @@
+# v0.3.1
+
+* Fix `anonymised_at` column [#13](https://github.com/gocardless/anony/pull/13)
+
 # v0.3.0
 
 * Support `anonymised_at` column [#9](https://github.com/gocardless/anony/pull/9)

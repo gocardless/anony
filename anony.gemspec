@@ -28,5 +28,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec_junit_formatter", "~> 0.4"
   spec.add_development_dependency "rubocop", "~> 0.76"
 
+  # For spec/anony/activerecord_spec.rb
+  spec.add_development_dependency "activerecord", "~> 6.0.1"
+  spec.add_development_dependency "sqlite3", "~> 1.4.1"
+
   spec.add_dependency "activesupport"
 end

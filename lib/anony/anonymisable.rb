@@ -71,13 +71,10 @@ module Anony
   module Anonymisable
     extend ActiveSupport::Concern
 
+    ANONYMISED_AT = :anonymised_at
+
     class_methods do
       def anonymise(&block)
-        # Automatically update :anonymised_at column if it exists (can be overridden)
-        if column_names.include?("anonymised_at")
-          anonymiser.current_datetime(:anonymised_at)
-        end
-
         anonymiser.instance_eval(&block)
       end
 
@@ -91,15 +88,15 @@ module Anony
     def anonymise!
       raise FieldException, unhandled_fields unless valid_anonymisation?
 
-      if self.class.destroy_on_anonymise
-        destroy!
-      else
-        self.class.anonymisable_fields.each do |field, _|
-          anonymise_field(field)
-        end
+      return destroy! if self.class.destroy_on_anonymise
 
-        save!
+      anonymise_configured_fields
+
+      if self.class.column_names.include?(ANONYMISED_AT.to_s)
+        write_attribute(ANONYMISED_AT, Strategies::CurrentDatetime.call(nil))
       end
+
+      save!
     end
 
     #  VALIDATION.
@@ -107,10 +104,19 @@ module Anony
       self.class.destroy_on_anonymise || unhandled_fields.empty?
     end
 
+    private def anonymise_configured_fields
+      self.class.anonymisable_fields.each_key do |field|
+        anonymise_field(field)
+      end
+    end
+
     private def unhandled_fields
       anonymisable_columns =
-        self.class.column_names.map(&:to_sym).reject { |c| Config.ignore?(c) }
-      handled_fields = self.class.anonymisable_fields.map { |k, _| k }
+        self.class.column_names.map(&:to_sym).
+          reject { |c| Config.ignore?(c) }.
+          reject { |c| c == ANONYMISED_AT }
+
+      handled_fields = self.class.anonymisable_fields.keys
 
       anonymisable_columns - handled_fields
     end
