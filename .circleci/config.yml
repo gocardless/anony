@@ -1,9 +1,13 @@
 version: 2
 
-jobs:
-  build:
+references:
+  default: &default
     docker:
       - image: ruby:2.6
+
+jobs:
+  install_dependencies:
+    <<: *default
     steps:
       - checkout
 
@@ -18,6 +22,14 @@ jobs:
         paths:
           - vendor/bundle
 
+  test:
+    <<: *default
+    steps:
+      - checkout
+      - type: cache-restore
+        key: anony-bundler-{{ checksum "anony.gemspec" }}
+      - run: gem install bundler -v 2.0.2
+      - run: bundle install --path vendor/bundle
       - type: shell
         command: |
           bundle exec rspec --profile 10 \
@@ -29,9 +41,22 @@ jobs:
       - type: store_test_results
         path: /tmp/test-results
 
+  lint:
+    <<: *default
+    steps:
+      - checkout
+      - type: cache-restore
+        key: anony-bundler-{{ checksum "anony.gemspec" }}
+      - run: gem install bundler -v 2.0.2
+      - run: bundle install --path vendor/bundle
       - run: bundle exec rubocop --parallel --extra-details --display-style-guide
+
 workflows:
   version: 2
   tests:
     jobs:
-      - build
+      - install_dependencies
+      - test:
+          requires: [install_dependencies]
+      - lint:
+          requires: [install_dependencies]
