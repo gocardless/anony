@@ -37,9 +37,7 @@ module RuboCop
 
         def on_class(node)
           only_models(node) do |model|
-            unless uses_anonymise?(node)
-              add_offense(node, message: sprintf(MSG, model: model))
-            end
+            add_offense(node, message: sprintf(MSG, model: model)) unless uses_anonymise?(node)
           end
         end
       end

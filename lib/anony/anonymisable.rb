@@ -22,10 +22,7 @@ module Anony
 
       raise ArgumentError, "Block or Strategy object required" unless strategy
       raise ArgumentError, "One or more fields required" unless fields.any?
-
-      if destroy_on_anonymise
-        raise ArgumentError, "Can't specify destroy and strategies for fields"
-      end
+      raise ArgumentError, "Can't specify destroy and strategies for fields" if destroy_on_anonymise
 
       fields.each { |field| anonymisable_fields[field] = strategy }
     end
