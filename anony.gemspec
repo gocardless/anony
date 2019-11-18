@@ -22,6 +22,8 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
 
+  spec.required_ruby_version = ">= 2.5"
+
   spec.add_development_dependency "bundler", "~> 2.0.2"
   spec.add_development_dependency "gc_ruboconfig", "~> 2.7.1"
   spec.add_development_dependency "rspec", "~> 3.9"
