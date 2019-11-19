@@ -1,62 +1,46 @@
 version: 2
 
 references:
-  default: &default
-    docker:
-      - image: ruby:2.6
+  steps: &steps
+    - checkout
+
+    - type: cache-restore
+      key: anony-bundler-{{ checksum "anony.gemspec" }}
+
+    - run: gem install bundler -v 2.0.2
+    - run: bundle install --path vendor/bundle
+
+    - type: cache-save
+      key: anony-bundler-{{ checksum "anony.gemspec" }}
+      paths:
+        - vendor/bundle
+
+    - type: shell
+      command: |
+        bundle exec rspec --profile 10 \
+                          --format RspecJunitFormatter \
+                          --out /tmp/test-results/rspec.xml \
+                          --format progress \
+                          spec
+
+    - type: store_test_results
+      path: /tmp/test-results
+
+    - run: bundle exec rubocop --parallel --extra-details --display-style-guide
 
 jobs:
-  install_dependencies:
-    <<: *default
-    steps:
-      - checkout
-
-      - type: cache-restore
-        key: anony-bundler-{{ checksum "anony.gemspec" }}
-
-      - run: gem install bundler -v 2.0.2
-      - run: bundle install --path vendor/bundle
-
-      - type: cache-save
-        key: anony-bundler-{{ checksum "anony.gemspec" }}
-        paths:
-          - vendor/bundle
-
-  test:
-    <<: *default
-    steps:
-      - checkout
-      - type: cache-restore
-        key: anony-bundler-{{ checksum "anony.gemspec" }}
-      - run: gem install bundler -v 2.0.2
-      - run: bundle install --path vendor/bundle
-      - type: shell
-        command: |
-          bundle exec rspec --profile 10 \
-                            --format RspecJunitFormatter \
-                            --out /tmp/test-results/rspec.xml \
-                            --format progress \
-                            spec
-
-      - type: store_test_results
-        path: /tmp/test-results
-
-  lint:
-    <<: *default
-    steps:
-      - checkout
-      - type: cache-restore
-        key: anony-bundler-{{ checksum "anony.gemspec" }}
-      - run: gem install bundler -v 2.0.2
-      - run: bundle install --path vendor/bundle
-      - run: bundle exec rubocop --parallel --extra-details --display-style-guide
+  ruby25:
+    docker:
+      - image: ruby:2.5
+    steps: *steps
+  ruby26:
+    docker:
+      - image: ruby:2.6
+    steps: *steps
 
 workflows:
   version: 2
   tests:
     jobs:
-      - install_dependencies
-      - test:
-          requires: [install_dependencies]
-      - lint:
-          requires: [install_dependencies]
+      - ruby25
+      - ruby26
