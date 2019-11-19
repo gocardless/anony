@@ -39,10 +39,6 @@ module Anony
       with_strategy(Strategies::AnonymisedPhoneNumber, *fields)
     end
 
-    def nilable(*fields)
-      with_strategy(Strategies::Nilable, *fields)
-    end
-
     def current_datetime(*fields)
       with_strategy(Strategies::CurrentDatetime, *fields)
     end
@@ -64,6 +60,18 @@ module Anony
       end
 
       @destroy_on_anonymise = true
+    end
+
+    private
+
+    def method_missing(method_name, *fields)
+      raise NoMethodError unless respond_to_missing?(method_name)
+
+      with_strategy(*fields, &Anony::Config.strategy(method_name))
+    end
+
+    def respond_to_missing?(method_name)
+      Anony::Config.strategy(method_name) != nil
     end
   end
 

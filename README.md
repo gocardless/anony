@@ -59,7 +59,7 @@ employee
  => #≤Employee id="1" first_name="bf2eb0fec2ac" middle_name=nil>
 ```
 
-The default strategies include:
+The strategies that ship with Anony are:
 
 * **nilable**, overwrites the field with `nil`
 * **hex**, overwrites the field with random hexadecimal characters
@@ -71,16 +71,18 @@ The default strategies include:
 
 ### Custom strategies
 
-Anony defines some common strategies internally, but you can also write your own - they
-just need to be Ruby objects which conform to the `.call(existing_value)` signature:
+It's also possible to define your own strategies using the same interface that Anony uses
+(this means you can also override the default ones to suit your use case). All you need to
+do is call `Anony::Config.register_strategy(name, &block)`. For example, you might want to
+do this in an initializer:
 
 ```ruby
-module OverwriteUUID
-  def self.call(_existing_value)
-    SecureRandom.uuid
-  end
+Anony::Config.register_strategy(:overwrite_uuid) do |_existing_value|
+  SecureRandom.uuid
 end
 ```
+
+Strategies are then accessible in the `anonymise` block using the strategy name:
 
 ```ruby
 require "overwrite_uuid"
@@ -89,14 +91,14 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    with_strategy OverwriteUUID, :id
+    overwrite_uuid :id
   end
 end
 ```
 
-You can also use a block. Blocks are executed in the context of the model so they can
-access local properties & methods, and they take the existing value of the column as the
-only argument:
+You can also use blocks dynamically for one-off uses. Blocks are executed in the context
+of the model so they can access local properties & methods, and they take the existing
+value of the column as the only argument:
 
 ```ruby
 class Employee < ApplicationRecord

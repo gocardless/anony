@@ -418,7 +418,7 @@ RSpec.describe Anony::Anonymisable do
     end
 
     it "calls the relevant anonymisers" do
-      expect(Anony::Strategies::Nilable).to receive(:call).with("foo")
+      expect(Anony::Config.strategy(:nilable)).to receive(:call).with("foo")
       expect(Anony::Strategies::AnonymisedEmail).to receive(:call).with("baz")
       expect(Anony::Strategies::AnonymisedPhoneNumber).to receive(:call).with("qux")
       expect(Anony::Strategies::CurrentDatetime).to receive(:call).with("qax")

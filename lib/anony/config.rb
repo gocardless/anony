@@ -21,6 +21,16 @@ module Anony
 
     self.ignores = []
 
+    def self.register_strategy(name, &block)
+      @strategies[name] = block
+    end
+
+    def self.strategy(name)
+      @strategies[name]
+    end
+
+    @strategies = {}
+
     self.email_template = "%s@example.com"
     self.phone_number = "+1 617 555 1294"
   end
