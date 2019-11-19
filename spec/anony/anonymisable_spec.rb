@@ -17,6 +17,7 @@ RSpec.describe Anony::Anonymisable do
         attr_accessor :a_field
         attr_accessor :b_field
         attr_accessor :c_field
+        attr_accessor :d_field
         attr_accessor :ignore_one
         attr_accessor :ignore_two
 
@@ -24,6 +25,7 @@ RSpec.describe Anony::Anonymisable do
           with_strategy StubAnoynmiser, :a_field
           with_strategy(:b_field) { |v, _| v.reverse }
           with_strategy(:c_field) { some_instance_method? ? "yes" : "no" }
+          with_strategy 321, :d_field
 
           ignore :ignore_one, :ignore_two
         end
@@ -53,6 +55,7 @@ RSpec.describe Anony::Anonymisable do
       model.a_field = double
       model.b_field = "abc"
       model.c_field = double
+      model.d_field = 123
       model.ignore_one = model.ignore_two = double
     end
 
@@ -61,7 +64,8 @@ RSpec.describe Anony::Anonymisable do
         expect { model.anonymise! }.
           to change(model, :a_field).to("OVERWRITTEN DATA").
           and change(model, :b_field).to("cba").
-          and change(model, :c_field).to("yes")
+          and change(model, :c_field).to("yes").
+          and change(model, :d_field).to(321)
       end
 
       it "saves the model" do
