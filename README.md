@@ -98,7 +98,7 @@ If your strategy doesn't respond to `.call`, then it will be used as a constant 
 whenever the field is anonymised.
 
 ```ruby
-class Employee < ApplicationRecord
+class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
@@ -121,7 +121,7 @@ access local properties & methods, and they take the existing value of the colum
 only argument:
 
 ```ruby
-class Employee < ApplicationRecord
+class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
@@ -142,7 +142,7 @@ manager
 
 ### Identifying anonymised records
 
-If your model has an `anonymised_at` column, we will automatically set that value when
+If your model has an `anonymised_at` column, anony will automatically set that value when
 calling `#anonymise!` (similar to how Rails will modify the `updated_at` timestamp). This
 means you could automatically filter out anonymised records without matching on the
 anonymised values.
