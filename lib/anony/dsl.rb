@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "strategies"
+
 module Anony
   # The interface for configuring strategies. All of the methods here are made available
   # inside the `anonymise { ... }` block:
@@ -11,6 +13,8 @@ module Anony
   #     with_strategy(:last_name) { "last-#{id}" }
   #   end
   class DSL
+    include Strategies
+
     # @!visibility private
     def initialize
       @anonymisable_fields = {}

@@ -73,8 +73,26 @@ The default strategies include:
 
 ### Custom strategies
 
-Anony defines some common strategies internally, but you can also write your own - they
-just need to be Ruby objects which conform to the `.call(existing_value)` signature:
+You can override the default strategies, or add your own ones to make them available
+everywhere, using the `Anony::Strategies.register(name, &block)` method somewhere after
+your application boots:
+
+```ruby
+Anony::Strategies.register(:reverse) do |original|
+  original.reverse
+end
+
+class Employee < ApplicationRecord
+  include Anony::Anonymisable
+
+  anonymise do
+    reverse :first_name
+  end
+end
+```
+
+You can also use strategies on a case-by-case basis, by honouring the
+`.call(existing_value)` signature:
 
 ```ruby
 module OverwriteUUID
