@@ -94,6 +94,28 @@ class Manager < ApplicationRecord
 end
 ```
 
+If your strategy doesn't respond to `.call`, then it will be used as a constant value
+whenever the field is anonymised.
+
+```ruby
+class Employee < ApplicationRecord
+  include Anony::Anonymisable
+
+  anonymise do
+    with_strategy 123, :id
+  end
+end
+
+manager = Manager.first
+ => #<Manager id=42>
+
+manager.anonymise!
+ => true
+
+manager
+ => #<Manager id=123>
+```
+
 You can also use a block. Blocks are executed in the context of the model so they can
 access local properties & methods, and they take the existing value of the column as the
 only argument:

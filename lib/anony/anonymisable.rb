@@ -13,7 +13,7 @@ module Anony
     attr_reader :anonymisable_fields, :destroy_on_anonymise
 
     def with_strategy(strategy, *fields, &block)
-      unless strategy.respond_to?(:call)
+      if block_given?
         fields.unshift(strategy)
         strategy = block
       end
@@ -126,13 +126,17 @@ module Anony
       strategy = self.class.anonymisable_fields.fetch(field)
       current_value = read_attribute(field)
 
-      anonymised_value = if strategy.is_a?(Proc)
-                           instance_exec(current_value, &strategy)
-                         else
-                           strategy.call(current_value)
-                         end
+      write_attribute(field, anonymised_value(strategy, current_value))
+    end
 
-      write_attribute(field, anonymised_value)
+    private def anonymised_value(strategy, current_value)
+      if strategy.is_a?(Proc)
+        instance_exec(current_value, &strategy)
+      elsif strategy.respond_to?(:call)
+        strategy.call(current_value)
+      else
+        strategy
+      end
     end
   end
 end
