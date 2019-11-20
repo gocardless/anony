@@ -318,67 +318,13 @@ RSpec.describe Anony::Anonymisable do
       end
     end
 
+    # rubocop:disable RSpec/MultipleExpectations
     it "models do not leak configuration" do
       #  We had a case where these leaked, so we want to explicitly test it.
       expect(a_class.anonymisable_fields).to match(a_field: anything)
       expect(b_class.anonymisable_fields).to match(b_field: anything)
     end
-  end
-
-  describe "#with_strategy" do
-    let(:config) { Anony::AnonymisableConfig.new }
-
-    context "no arguments" do
-      it "throws an argumenterror" do
-        expect { config.with_strategy }.to raise_error(ArgumentError)
-      end
-    end
-
-    context "strategy without any fields" do
-      it "throws an argumenterror" do
-        expect { config.with_strategy(StubAnoynmiser) }.to raise_error(ArgumentError)
-      end
-    end
-
-    context "field without any strategy" do
-      it "throws an argumenterror" do
-        expect { config.with_strategy(:field) }.to raise_error(ArgumentError)
-      end
-    end
-
-    it "with an array of fields and no block / strategy" do
-      expect { config.with_strategy(%i[foo bar]) }.to raise_error(ArgumentError)
-    end
-
-    context "two arguments" do
-      it "registers the field to the strategy" do
-        config.with_strategy(StubAnoynmiser, :field)
-        expect(config.anonymisable_fields).to eq(field: StubAnoynmiser)
-      end
-
-      it "with a block" do
-        config.with_strategy(:foo, :bar) { |v| v }
-        expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
-      end
-
-      it "with a strategy and an array of fields" do
-        config.with_strategy(StubAnoynmiser, %i[foo bar])
-        expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
-        expect(config.anonymisable_fields.values).to all(eq(StubAnoynmiser))
-      end
-
-      it "with a block and an array of fields" do
-        config.with_strategy(%i[foo bar]) { |v| v }
-        expect(config.anonymisable_fields.keys).to eq(%i[foo bar])
-      end
-    end
-
-    context "a strategy for two fields" do
-      it "registers them correctly" do
-        config.with_strategy(StubAnoynmiser, :foo, :bar)
-        expect(config.anonymisable_fields).to eq(foo: StubAnoynmiser, bar: StubAnoynmiser)
-      end
-    end
+    # rubocop:enable RSpec/MultipleExpectations
   end
 
   describe "helper methods" do
@@ -421,6 +367,7 @@ RSpec.describe Anony::Anonymisable do
       model.started_at = "qax"
     end
 
+    # rubocop:disable RSpec/MultipleExpectations
     it "calls the relevant anonymisers" do
       expect(Anony::Strategies::Nilable).to receive(:call).with("foo")
       expect(Anony::Strategies::AnonymisedEmail).to receive(:call).with("baz")
@@ -431,5 +378,6 @@ RSpec.describe Anony::Anonymisable do
 
       model.anonymise!
     end
+    # rubocop:enable RSpec/MultipleExpectations
   end
 end

@@ -3,6 +3,7 @@
 module Anony
   require_relative "anony/anonymisable"
   require_relative "anony/config"
+  require_relative "anony/dsl"
   require_relative "anony/field_exception"
   require_relative "anony/strategies/anonymised_email"
   require_relative "anony/strategies/anonymised_phone_number"

@@ -18,10 +18,6 @@ RSpec/NestedGroups:
   Exclude:
     - 'spec/anony/anonymisable_spec.rb'
 
-RSpec/MultipleExpectations:
-  Exclude:
-    - 'spec/anony/anonymisable_spec.rb'
-
 RSpec/FilePath:
   Exclude:
     - 'spec/anony/cops/define_deletion_strategy_spec.rb'
