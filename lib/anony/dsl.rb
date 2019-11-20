@@ -85,13 +85,6 @@ module Anony
       with_strategy(Strategies::AnonymisedPhoneNumber, *fields)
     end
 
-    # Helper method to use the :nilable strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::Nilable
-    def nilable(*fields)
-      with_strategy(Strategies::Nilable, *fields)
-    end
-
     # Helper method to use the :current_datetime strategy
     # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
     # @see Strategies::CurrentDatetime
