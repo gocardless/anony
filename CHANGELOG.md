@@ -1,3 +1,7 @@
+# v0.4.0
+
+* Allow using a constant value as a strategy [#19](https://github.com/gocardless/anony/pull/19)
+
 # v0.3.1
 
 * Fix `anonymised_at` column [#13](https://github.com/gocardless/anony/pull/13)
