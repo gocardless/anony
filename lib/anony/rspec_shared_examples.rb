@@ -3,7 +3,9 @@
 require "rspec"
 
 RSpec.shared_examples "anonymisable model" do
-  it { is_expected.to be_valid_anonymisation }
+  it "has a valid strategy defined" do
+    expect(subject.class).to be_valid_anonymisation
+  end
 
   it "successfully calls #anonymise!" do
     expect(subject.anonymise!).to be true
@@ -11,7 +13,9 @@ RSpec.shared_examples "anonymisable model" do
 end
 
 RSpec.shared_examples "anonymisable model with destruction" do
-  it { is_expected.to be_valid_anonymisation }
+  it "has a valid strategy defined" do
+    expect(subject.class).to be_valid_anonymisation
+  end
 
   it "destroys the model" do
     expect { subject.anonymise! }.to change(described_class, :count).by(-1)
