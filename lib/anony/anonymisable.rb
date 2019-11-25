@@ -1,17 +1,14 @@
 # frozen_string_literal: true
 
-require "active_support/concern"
 require "active_support/core_ext/module"
 
 require_relative "dsl"
 
 module Anony
   module Anonymisable
-    extend ActiveSupport::Concern
-
     ANONYMISED_AT = :anonymised_at
 
-    class_methods do
+    module ClassMethods
       def anonymise(&block)
         anonymise_config.instance_eval(&block)
       end
@@ -79,6 +76,10 @@ module Anony
       else
         strategy
       end
+    end
+
+    def self.included(base)
+      base.extend(ClassMethods)
     end
   end
 end
