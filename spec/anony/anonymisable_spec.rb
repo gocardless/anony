@@ -338,15 +338,14 @@ RSpec.describe Anony::Anonymisable do
       klass = Class.new do
         include Anony::Anonymisable
 
-        attr_accessor :hexy, :phone_numba
+        attr_accessor :hexy
 
         def self.column_names
-          %w[hexy phone_numba]
+          %w[hexy]
         end
 
         anonymise do
           hex :hexy
-          phone_number :phone_numba
         end
 
         alias_method :read_attribute, :send
@@ -364,17 +363,13 @@ RSpec.describe Anony::Anonymisable do
 
     before do
       model.hexy = "bar"
-      model.phone_numba = "qux"
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it "calls the relevant anonymisers" do
-      expect(Anony::Strategies::AnonymisedPhoneNumber).to receive(:call).with("qux")
       expect_any_instance_of(Anony::Strategies::OverwriteHex).
         to receive(:call).with("bar")
 
       model.anonymise!
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 end

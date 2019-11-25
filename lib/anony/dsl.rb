@@ -71,13 +71,6 @@ module Anony
       with_strategy(Strategies::OverwriteHex.new(max_length), *fields)
     end
 
-    # Helper method to use the :phone_number strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::AnonymisedPhoneNumber
-    def phone_number(*fields)
-      with_strategy(Strategies::AnonymisedPhoneNumber, *fields)
-    end
-
     # Configure a list of fields that you don't want to anonymise.
     #
     # @param [Array<Symbol>] fields The fields to ignore

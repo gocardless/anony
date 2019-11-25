@@ -14,14 +14,6 @@ module Anony
   module Config
     mattr_accessor :ignores
 
-    # @!attribute phone_number
-    #   @!scope class
-    #   The phone number that will be used when using the :phone_number strategy.
-    #   @see Strategies::AnonymisedPhoneNumber
-    #   @example
-    #     Anony::Config.phone_number = "+44 1632 960670"
-    mattr_accessor :phone_number
-
     # @!visibility private
     def self.ignore?(field)
       # In this case, we want to support literal matches, regular expressions and blocks,
@@ -46,6 +38,5 @@ module Anony
     end
 
     self.ignores = []
-    self.phone_number = "+1 617 555 1294"
   end
 end
