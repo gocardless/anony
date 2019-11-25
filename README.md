@@ -65,8 +65,7 @@ The default strategies include:
 
 * **nilable**, overwrites the field with `nil`
 * **hex**, overwrites the field with random hexadecimal characters
-* **email**, overwrites the field with a configured email (see
-  [Configuration](#configuration))
+* **email**, overwrites the field with an email
 * **phone_number**, overwrites the field with a configured phone number (see
   [Configuration](#configuration))
 * **current_datetime**, overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
@@ -90,6 +89,11 @@ class Employee < ApplicationRecord
   end
 end
 ```
+
+> One strategy you might want to override is `:email`, if your application has a more
+> specific replacement. For example, at GoCardless we use an email on the
+> `@gocardless.com` domain so we can ensure any emails accidentally sent to this address
+> would be quickly identified and fixed.
 
 You can also use strategies on a case-by-case basis, by honouring the
 `.call(existing_value)` signature:
@@ -233,7 +237,6 @@ recommend making these changes in an initializer if needed:
 # config/initializers/anony.rb
 
 Anony::Config.ignore_fields(:id, :created_at, :updated_at)
-Anony::Config.email_template = "nobody@example.net"
 Anony::Config.phone_number = "+44 7700 123 456"
 ```
 
@@ -243,15 +246,9 @@ Globally permit common column names (for example, `id`, `created_at` and `update
 Rails applications often appear by default in all models). By default, there are no
 columns in this list (`[]`).
 
-### `.email_template`
-
-Configure the replacement email (by default, it will be `"#{random}@example.com"`).
-
 ### `.phone_number`
 
 Configure the replacement phone (by default, it will be `"+1 617 555 1294"`).
-
-
 
 ## Testing
 

@@ -14,20 +14,6 @@ module Anony
   module Config
     mattr_accessor :ignores
 
-    # @!attribute email_template
-    #   @!scope class
-    #   The email template that will be used when using the :email strategy. If you
-    #   optionally define a `%s` inside a string, it will be replaced with
-    #   `SecureRandom.uuid`.
-    #   @see Strategies::AnonymisedEmail
-    #
-    #   @example With string substitution
-    #     Anony::Config.email_template = "anonymised-%s@example.com"
-    #
-    #   @example Static string
-    #     Anony::Config.email_template = "nobody@example.net"
-    mattr_accessor :email_template
-
     # @!attribute phone_number
     #   @!scope class
     #   The phone number that will be used when using the :phone_number strategy.
@@ -60,8 +46,6 @@ module Anony
     end
 
     self.ignores = []
-
-    self.email_template = "%s@example.com"
     self.phone_number = "+1 617 555 1294"
   end
 end

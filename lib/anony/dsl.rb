@@ -71,13 +71,6 @@ module Anony
       with_strategy(Strategies::OverwriteHex.new(max_length), *fields)
     end
 
-    # Helper method to use the :email strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::AnonymisedEmail
-    def email(*fields)
-      with_strategy(Strategies::AnonymisedEmail, *fields)
-    end
-
     # Helper method to use the :phone_number strategy
     # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
     # @see Strategies::AnonymisedPhoneNumber
