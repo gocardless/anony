@@ -27,7 +27,7 @@ Alternatively, you can just mix it into models as needed:
 ```ruby
 class User < ApplicationRecord
   include Anony::Anonymisable
-  ...
+  # ...
 end
 ```
 
@@ -48,14 +48,16 @@ class Employee < ApplicationRecord
     ignore :id
   end
 end
+```
 
-employee = Employee.find(1)
+```
+irb(main):001:0> employee = Employee.find(1)
  => #≤Employee id="1" first_name="Alice" middle_name="in">
 
-employee.anonymise!
+irb(main):002:0> employee.anonymise!
  => true
 
-employee
+irb(main):003:0> employee
  => #≤Employee id="1" first_name="bf2eb0fec2ac" middle_name=nil>
 ```
 
@@ -105,14 +107,16 @@ class Manager < ApplicationRecord
     with_strategy 123, :id
   end
 end
+```
 
-manager = Manager.first
+```
+irb(main):001:0> manager = Manager.first
  => #<Manager id=42>
 
-manager.anonymise!
+irb(main):002:0> manager.anonymise!
  => true
 
-manager
+irb(main):003:0> manager
  => #<Manager id=123>
 ```
 
@@ -129,14 +133,16 @@ class Manager < ApplicationRecord
     with_strategy(:last_name) { "previous-name-of-#{id}" }
   end
 end
+```
 
-manager = Manager.first
+```
+irb(main):001:0> manager = Manager.first
  => #<Manager id=42>
 
-manager.anonymise!
+irb(main):002:0> manager.anonymise!
  => true
 
-manager
+irb(main):003:0> manager
  => #<Manager id="e9ab2800-d4b9-4227-94a7-7f81118d8a8a">
 ```
 
@@ -185,14 +191,16 @@ class Temporary < ApplicationRecord
     destroy
   end
 end
+```
 
-temporary = Temporary.first
+```
+irb(main):001:0> temporary = Temporary.first
  => #<Temporary id=42>
 
-temporary.anonymise!
+irb(main):002:0> temporary.anonymise!
  => true
 
-temporary.persisted?
+irb(main):003:0> temporary.persisted?
  => false
 ```
 
