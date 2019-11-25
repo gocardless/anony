@@ -10,18 +10,16 @@ module RuboCop
       # This cop checks whether an ActiveRecord model implements the `.anonymise`
       # preference (using the Anony gem).
       #
-      # @example
-      #
-      # # good
-      # class User < ApplicationRecord
-      #   anonymise do
-      #     email :email
-      #     hex :given_name
+      # @example Good
+      #   class User < ApplicationRecord
+      #     anonymise do
+      #       email :email
+      #       hex :given_name
+      #     end
       #   end
-      # end
       #
-      # # bad
-      # class MyNewThing < ApplicationRecord; end
+      # @example Bad
+      #   class MyNewThing < ApplicationRecord; end
       class DefineDeletionStrategy < Cop
         MSG = "Define .anonymise for %<model>s, see https://github.com/gocardless/" \
               "anony/blob/#{Anony::VERSION}/README.md for details"
