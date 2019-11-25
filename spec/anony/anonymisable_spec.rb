@@ -332,44 +332,4 @@ RSpec.describe Anony::Anonymisable do
     end
     # rubocop:enable RSpec/MultipleExpectations
   end
-
-  describe "helper methods" do
-    let(:model) do
-      klass = Class.new do
-        include Anony::Anonymisable
-
-        attr_accessor :hexy
-
-        def self.column_names
-          %w[hexy]
-        end
-
-        anonymise do
-          hex :hexy
-        end
-
-        alias_method :read_attribute, :send
-        def write_attribute(field, value)
-          send("#{field}=", value)
-        end
-
-        def save!
-          true
-        end
-      end
-
-      klass.new
-    end
-
-    before do
-      model.hexy = "bar"
-    end
-
-    it "calls the relevant anonymisers" do
-      expect_any_instance_of(Anony::Strategies::OverwriteHex).
-        to receive(:call).with("bar")
-
-      model.anonymise!
-    end
-  end
 end
