@@ -21,10 +21,29 @@ module Anony
       end
 
       delegate :anonymisable_fields, :destroy_on_anonymise, to: :anonymise_config
+
+      def valid_anonymisation?
+        destroy_on_anonymise || unhandled_fields.empty?
+      end
+
+      def validate_anonymisation!
+        raise FieldException, unhandled_fields unless valid_anonymisation?
+      end
+
+      private def unhandled_fields
+        anonymisable_columns =
+          column_names.map(&:to_sym).
+            reject { |c| Config.ignore?(c) }.
+            reject { |c| c == ANONYMISED_AT }
+
+        handled_fields = anonymisable_fields.keys
+
+        anonymisable_columns - handled_fields
+      end
     end
 
     def anonymise!
-      raise FieldException, unhandled_fields unless valid_anonymisation?
+      self.class.validate_anonymisation!
 
       return destroy! if self.class.destroy_on_anonymise
 
@@ -37,26 +56,10 @@ module Anony
       save!
     end
 
-    #  VALIDATION.
-    def valid_anonymisation?
-      self.class.destroy_on_anonymise || unhandled_fields.empty?
-    end
-
     private def anonymise_configured_fields
       self.class.anonymisable_fields.each_key do |field|
         anonymise_field(field)
       end
-    end
-
-    private def unhandled_fields
-      anonymisable_columns =
-        self.class.column_names.map(&:to_sym).
-          reject { |c| Config.ignore?(c) }.
-          reject { |c| c == ANONYMISED_AT }
-
-      handled_fields = self.class.anonymisable_fields.keys
-
-      anonymisable_columns - handled_fields
     end
 
     private def anonymise_field(field)

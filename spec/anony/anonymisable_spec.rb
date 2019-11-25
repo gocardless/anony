@@ -10,8 +10,8 @@ RSpec.describe Anony::Anonymisable do
   end
 
   context "valid model anonymisation" do
-    let(:model) do
-      klass = Class.new do
+    let(:klass) do
+      Class.new do
         include Anony::Anonymisable
 
         attr_accessor :a_field
@@ -47,9 +47,9 @@ RSpec.describe Anony::Anonymisable do
           true
         end
       end
-
-      klass.new
     end
+
+    let(:model) { klass.new }
 
     before do
       model.a_field = double
@@ -83,15 +83,15 @@ RSpec.describe Anony::Anonymisable do
     describe "#valid_anonymisation?" do
       context "all fields are handled" do
         it "is valid" do
-          expect(model).to be_valid_anonymisation
+          expect(klass).to be_valid_anonymisation
         end
       end
     end
   end
 
   context "destroy on anonymise" do
-    let(:model) do
-      klass = Class.new do
+    let(:klass) do
+      Class.new do
         include Anony::Anonymisable
 
         attr_accessor :a_field
@@ -104,9 +104,9 @@ RSpec.describe Anony::Anonymisable do
           true
         end
       end
-
-      klass.new
     end
+
+    let(:model) { klass.new }
 
     describe "#anonymise!" do
       it "destroys the model" do
@@ -118,42 +118,50 @@ RSpec.describe Anony::Anonymisable do
 
     describe "#valid_anonymisation?" do
       it "is valid" do
-        expect(model).to be_valid_anonymisation
+        expect(klass).to be_valid_anonymisation
       end
     end
   end
 
   context "invalid model anonymisation" do
-    describe "#valid_anonymisation?" do
-      let(:model) do
-        klass = Class.new do
-          include Anony::Anonymisable
+    let(:klass) do
+      Class.new do
+        include Anony::Anonymisable
 
-          attr_accessor :a_field
-          attr_accessor :b_field
+        attr_accessor :a_field
+        attr_accessor :b_field
 
-          anonymise do
-            with_strategy StubAnoynmiser, :a_field
-          end
-
-          def self.column_names
-            %w[a_field b_field]
-          end
+        anonymise do
+          with_strategy StubAnoynmiser, :a_field
         end
 
-        klass.new
+        def self.column_names
+          %w[a_field b_field]
+        end
       end
+    end
 
+    describe "#valid_anonymisation?" do
       it "fails" do
-        expect(model).to_not be_valid_anonymisation
+        expect(klass).to_not be_valid_anonymisation
+      end
+    end
+
+    describe "anonymise!" do
+      let(:model) { klass.new }
+
+      it "throws an exception" do
+        expect { model.anonymise! }.to raise_error(
+          Anony::FieldException, "Invalid anonymisation strategy for field(s) [:b_field]"
+        )
       end
     end
   end
 
   context "no anonymise block" do
     describe "#valid_anonymisation?" do
-      let(:model) do
-        klass = Class.new do
+      let(:klass) do
+        Class.new do
           include Anony::Anonymisable
 
           attr_accessor :a_field
@@ -163,12 +171,10 @@ RSpec.describe Anony::Anonymisable do
             %w[a_field b_field]
           end
         end
-
-        klass.new
       end
 
       it "fails" do
-        expect(model).to_not be_valid_anonymisation
+        expect(klass).to_not be_valid_anonymisation
       end
     end
   end
@@ -236,7 +242,7 @@ RSpec.describe Anony::Anonymisable do
     end
 
     it "is a valid anonymisation even though column is not configured" do
-      expect(klass.new).to be_valid_anonymisation
+      expect(klass).to be_valid_anonymisation
     end
 
     it "sets anonymised_at = Time.zone.now when anonymising" do
@@ -283,7 +289,7 @@ RSpec.describe Anony::Anonymisable do
         end
       end
 
-      expect(klass.new).to be_valid_anonymisation
+      expect(klass).to be_valid_anonymisation
     end
   end
 
