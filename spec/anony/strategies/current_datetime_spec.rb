@@ -2,8 +2,8 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::Strategies::CurrentDatetime do
-  subject(:result) { described_class.call(value) }
+RSpec.describe "current_datetime strategy" do # rubocop:disable RSpec/DescribeClass
+  subject(:result) { Anony::Strategies[:current_datetime].call(value) }
 
   let(:value) { "old value" }
 

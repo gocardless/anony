@@ -78,13 +78,6 @@ module Anony
       with_strategy(Strategies::AnonymisedPhoneNumber, *fields)
     end
 
-    # Helper method to use the :current_datetime strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::CurrentDatetime
-    def current_datetime(*fields)
-      with_strategy(Strategies::CurrentDatetime, *fields)
-    end
-
     # Configure a list of fields that you don't want to anonymise.
     #
     # @param [Array<Symbol>] fields The fields to ignore
