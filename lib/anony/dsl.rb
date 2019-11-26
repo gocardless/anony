@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "strategies"
+
 module Anony
   # The interface for configuring strategies. All of the methods here are made available
   # inside the `anonymise { ... }` block:
@@ -11,6 +13,8 @@ module Anony
   #     with_strategy(:last_name) { "last-#{id}" }
   #   end
   class DSL
+    include Strategies
+
     # @!visibility private
     def initialize
       @anonymisable_fields = {}
@@ -65,34 +69,6 @@ module Anony
     # @see Strategies::OverwriteHex
     def hex(*fields, max_length: 36)
       with_strategy(Strategies::OverwriteHex.new(max_length), *fields)
-    end
-
-    # Helper method to use the :email strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::AnonymisedEmail
-    def email(*fields)
-      with_strategy(Strategies::AnonymisedEmail, *fields)
-    end
-
-    # Helper method to use the :phone_number strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::AnonymisedPhoneNumber
-    def phone_number(*fields)
-      with_strategy(Strategies::AnonymisedPhoneNumber, *fields)
-    end
-
-    # Helper method to use the :nilable strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::Nilable
-    def nilable(*fields)
-      with_strategy(Strategies::Nilable, *fields)
-    end
-
-    # Helper method to use the :current_datetime strategy
-    # @param [Array<Symbol>] fields A list of one or more fields to apply this strategy to.
-    # @see Strategies::CurrentDatetime
-    def current_datetime(*fields)
-      with_strategy(Strategies::CurrentDatetime, *fields)
     end
 
     # Configure a list of fields that you don't want to anonymise.

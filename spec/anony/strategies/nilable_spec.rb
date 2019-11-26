@@ -2,12 +2,10 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::Strategies::Nilable do
-  describe ".call" do
-    subject(:result) { described_class.call(value) }
+RSpec.describe "nilable strategy" do # rubocop:disable RSpec/DescribeClass
+  subject(:result) { Anony::Strategies[:nilable].call(value) }
 
-    let(:value) { "old value" }
+  let(:value) { "old value" }
 
-    it { is_expected.to be nil }
-  end
+  it { is_expected.to be nil }
 end

@@ -3,9 +3,9 @@
 require "spec_helper"
 
 RSpec.describe Anony::DSL do
-  describe "#with_strategy" do
-    let(:config) { described_class.new }
+  let(:config) { described_class.new }
 
+  describe "#with_strategy" do
     context "no arguments" do
       it "throws an argumenterror" do
         expect { config.with_strategy }.to raise_error(ArgumentError)
@@ -58,6 +58,13 @@ RSpec.describe Anony::DSL do
         config.with_strategy(StubAnoynmiser, :foo, :bar)
         expect(config.anonymisable_fields).to eq(foo: StubAnoynmiser, bar: StubAnoynmiser)
       end
+    end
+  end
+
+  context "when using dynamic strategies" do
+    it "is not possible to override the builtin methods like :destroy" do
+      Anony::Strategies.register(:destroy) { raise "Oops!" }
+      expect { config.destroy }.to_not raise_error
     end
   end
 end

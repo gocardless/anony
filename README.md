@@ -65,16 +65,38 @@ The default strategies include:
 
 * **nilable**, overwrites the field with `nil`
 * **hex**, overwrites the field with random hexadecimal characters
-* **email**, overwrites the field with a configured email (see
-  [Configuration](#configuration))
-* **phone_number**, overwrites the field with a configured phone number (see
-  [Configuration](#configuration))
+* **email**, overwrites the field with an email
+* **phone_number**, overwrites the field with a dummy phone number
 * **current_datetime**, overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
 
 ### Custom strategies
 
-Anony defines some common strategies internally, but you can also write your own - they
-just need to be Ruby objects which conform to the `.call(existing_value)` signature:
+You can override the default strategies, or add your own ones to make them available
+everywhere, using the `Anony::Strategies.register(name, &block)` method somewhere after
+your application boots:
+
+```ruby
+Anony::Strategies.register(:reverse) do |original|
+  original.reverse
+end
+
+class Employee < ApplicationRecord
+  include Anony::Anonymisable
+
+  anonymise do
+    reverse :first_name
+  end
+end
+```
+
+> One strategy you might want to override is `:email`, if your application has a more
+> specific replacement. For example, at GoCardless we use an email on the
+> `@gocardless.com` domain so we can ensure any emails accidentally sent to this address
+> would be quickly identified and fixed. `:phone_number` is another strategy that you
+> might wish to replace (depending on your primary location).
+
+You can also use strategies on a case-by-case basis, by honouring the
+`.call(existing_value)` signature:
 
 ```ruby
 module OverwriteUUID
@@ -215,8 +237,6 @@ recommend making these changes in an initializer if needed:
 # config/initializers/anony.rb
 
 Anony::Config.ignore_fields(:id, :created_at, :updated_at)
-Anony::Config.email_template = "nobody@example.net"
-Anony::Config.phone_number = "+44 7700 123 456"
 ```
 
 ### `.ignore_fields`
@@ -224,16 +244,6 @@ Anony::Config.phone_number = "+44 7700 123 456"
 Globally permit common column names (for example, `id`, `created_at` and `updated_at` in
 Rails applications often appear by default in all models). By default, there are no
 columns in this list (`[]`).
-
-### `.email_template`
-
-Configure the replacement email (by default, it will be `"#{random}@example.com"`).
-
-### `.phone_number`
-
-Configure the replacement phone (by default, it will be `"+1 617 555 1294"`).
-
-
 
 ## Testing
 
