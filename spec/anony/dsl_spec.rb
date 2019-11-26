@@ -24,6 +24,17 @@ RSpec.describe Anony::DSL do
       end
     end
 
+    context "defining a strategy on a field which already has one defined" do
+      before do
+        config.with_strategy(StubAnoynmiser, :field)
+      end
+
+      it "throws an overwritten_strategy_exception" do
+        expect { config.with_strategy(Anony::Strategies::NoOp, :field) }.
+          to raise_error(Anony::OverwrittenStrategyException)
+      end
+    end
+
     it "with an array of fields and no block / strategy" do
       expect { config.with_strategy(%i[foo bar]) }.to raise_error(ArgumentError)
     end
