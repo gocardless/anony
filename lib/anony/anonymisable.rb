@@ -57,15 +57,13 @@ module Anony
     end
 
     private def anonymise_configured_fields
-      self.class.anonymisable_fields.each_key do |field|
-        anonymise_field(field)
-      end
+      self.class.column_names.each { |field| anonymise_field(field) }
     end
 
     private def anonymise_field(field)
-      raise FieldException, field unless self.class.anonymisable_fields.key?(field)
+      strategy = self.class.anonymisable_fields[field.to_sym]
+      return unless strategy.present?
 
-      strategy = self.class.anonymisable_fields.fetch(field)
       current_value = read_attribute(field)
 
       write_attribute(field, anonymised_value(strategy, current_value))
