@@ -1,3 +1,9 @@
+# v0.5.0
+
+* Make `valid_anonymisation?` a class method [#24](https://github.com/gocardless/anony/pull/24)
+* Allow dynamic registration of Anony::Strategies [#23](https://github.com/gocardless/anony/pull/23)
+* Only apply anonymisation strategies to columns that are defined [#28](https://github.com/gocardless/anony/pull/28)
+
 # v0.4.0
 
 * Allow using a constant value as a strategy [#19](https://github.com/gocardless/anony/pull/19)
