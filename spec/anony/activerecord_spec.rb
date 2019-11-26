@@ -2,46 +2,29 @@
 
 require "spec_helper"
 require "anony/rspec_shared_examples"
-
-require "sqlite3"
-require "active_record"
-
-# Connect to an in-memory sqlite3 database
-ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
-
-# Suppress STDOUT schema creation
-ActiveRecord::Schema.verbose = false
-
-# Define a minimal database schema
-ActiveRecord::Schema.define do
-  create_table :employees do |t|
-    t.string :first_name, null: false
-    t.string :last_name
-    t.string :company_name, null: false
-    t.string :email_address
-    t.string :phone_number
-    t.datetime :onboarded_at
-    t.datetime :anonymised_at
-  end
-end
-
-class Employee < ActiveRecord::Base
-  include Anony::Anonymisable
-
-  anonymise do
-    ignore :id
-    hex :first_name
-    nilable :last_name
-    email :email_address
-    phone_number :phone_number
-    current_datetime :onboarded_at
-    with_strategy(:company_name) { |old| "anonymised-#{old}" }
-  end
-end
+require_relative "helpers/database"
 
 RSpec.context "ActiveRecord integration" do
   subject(:instance) do
-    Employee.create(first_name: "William", last_name: "Gates", company_name: "Microsoft")
+    klass.create(first_name: "William", last_name: "Gates", company_name: "Microsoft")
+  end
+
+  let(:klass) do
+    Class.new(ActiveRecord::Base) do
+      include Anony::Anonymisable
+
+      self.table_name = :employees
+
+      anonymise do
+        ignore :id
+        hex :first_name
+        nilable :last_name
+        email :email_address
+        phone_number :phone_number
+        current_datetime :onboarded_at
+        with_strategy(:company_name) { |old| "anonymised-#{old}" }
+      end
+    end
   end
 
   it_behaves_like "anonymisable model"
