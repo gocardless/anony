@@ -61,6 +61,8 @@ module Anony
       raise ArgumentError, "One or more fields required" unless fields.any?
       raise ArgumentError, "Can't specify destroy and strategies for fields" if destroy_on_anonymise
 
+      guard_overwritten_strategies!(fields)
+
       fields.each { |field| anonymisable_fields[field] = strategy }
     end
 
@@ -107,6 +109,13 @@ module Anony
       end
 
       @destroy_on_anonymise = true
+    end
+
+    private def guard_overwritten_strategies!(fields)
+      defined_fields = anonymisable_fields.keys
+      overwritten_fields = defined_fields & fields
+
+      raise OverwrittenStrategyException, overwritten_fields if overwritten_fields.any?
     end
   end
 end
