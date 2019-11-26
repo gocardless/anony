@@ -42,6 +42,24 @@ module Anony
         anonymise_config.instance_eval(&block)
       end
 
+      def around_anonymisation(&block)
+        raise ArgumentError, "Block required" unless block_given?
+
+        anony_hooks[:around] = block
+      end
+
+      def before_anonymisation(&block)
+        raise ArgumentError, "Block required" unless block_given?
+
+        anony_hooks[:before].append(block)
+      end
+
+      def after_anonymisation(&block)
+        raise ArgumentError, "Block required" unless block_given?
+
+        anony_hooks[:after].append(block)
+      end
+
       # Check whether the model has been configured correctly. Returns a simple true/false.
       #
       # @return [Boolean]
@@ -49,6 +67,16 @@ module Anony
       #   Manager.valid_anonymisation?
       def valid_anonymisation?
         destroy_on_anonymise || unhandled_fields.empty?
+      end
+
+      def anony_hooks
+        @anony_hooks ||= {
+          before: [],
+          after: [],
+
+          # Only one `around` hook can exist at any given time
+          around: nil,
+        }
       end
 
       # Validates the configuration and raises an exception if it is invalid.
@@ -88,19 +116,31 @@ module Anony
     # @example
     #   manager = Manager.first
     #   manager.anonymise!
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def anonymise!
       self.class.validate_anonymisation!
 
       return destroy! if self.class.destroy_on_anonymise
 
-      anonymise_configured_fields
+      with_around_hook do
+        run_before_hooks
 
-      if self.class.column_names.include?(ANONYMISED_AT.to_s)
-        write_attribute(ANONYMISED_AT, Strategies[:current_datetime].call)
+        anonymise_configured_fields
+
+        if self.class.column_names.include?(ANONYMISED_AT.to_s)
+          write_attribute(ANONYMISED_AT, Strategies[:current_datetime].call)
+        end
+
+        v = save!
+
+        run_after_hooks
+
+        v
       end
-
-      save!
     end
+    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize
 
     private def anonymise_configured_fields
       self.class.anonymisable_fields.each_key do |field|
@@ -125,6 +165,27 @@ module Anony
         strategy.call(current_value)
       else
         strategy
+      end
+    end
+
+    private def run_before_hooks
+      self.class.anony_hooks[:before].each do |block|
+        block.call(self)
+      end
+    end
+
+    private def run_after_hooks
+      self.class.anony_hooks[:after].each do |block|
+        block.call(self)
+      end
+    end
+
+    private def with_around_hook(&block)
+      hook_block = self.class.anony_hooks[:around]
+      if hook_block.nil?
+        yield
+      else
+        hook_block.call(self, block)
       end
     end
 

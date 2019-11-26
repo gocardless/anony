@@ -275,4 +275,85 @@ RSpec.describe Anony::Anonymisable do
     end
     # rubocop:enable RSpec/MultipleExpectations
   end
+
+  context "with hooks" do
+    let(:model) { klass.new }
+
+    context "before hook" do
+      let(:klass) do
+        Class.new(ActiveRecord::Base) do
+          include Anony::Anonymisable
+
+          self.table_name = :a_fields
+
+          before_anonymisation do |obj|
+            obj.a_field = "before"
+          end
+
+          anonymise do
+            with_strategy(:a_field) { |value| "~#{value}~" }
+          end
+        end
+      end
+
+      describe "#anonymise!" do
+        it "runs before hoooks before anonymisation" do
+          expect { model.anonymise! }.
+            to change(model, :a_field).to("~before~")
+        end
+      end
+    end
+
+    context "after hook" do
+      let(:klass) do
+        Class.new(ActiveRecord::Base) do
+          include Anony::Anonymisable
+
+          self.table_name = :a_fields
+
+          after_anonymisation do |obj|
+            obj.a_field = "after #{obj.a_field}"
+          end
+
+          anonymise do
+            with_strategy(:a_field) { "ANON" }
+          end
+        end
+      end
+
+      describe "#anonymise!" do
+        it "runs before hoooks before anonymisation" do
+          expect { model.anonymise! }.
+            to change(model, :a_field).to("after ANON")
+        end
+      end
+    end
+
+    context "around hook" do
+      let(:klass) do
+        Class.new(ActiveRecord::Base) do
+          include Anony::Anonymisable
+
+          self.table_name = :a_fields
+
+          around_anonymisation do |obj, anonymiser|
+            obj.a_field = "before around"
+            anonymiser.call
+            obj.a_field = "!!#{obj.a_field}!!"
+          end
+
+          anonymise do
+            with_strategy(:a_field) { |value| "~#{value}~" }
+          end
+        end
+      end
+
+      describe "#anonymise!" do
+        it "runs before hoooks before anonymisation" do
+          expect { model.anonymise! }.
+            to change(model, :a_field).to("!!~before around~!!")
+        end
+      end
+    end
+  end
 end
