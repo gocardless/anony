@@ -27,11 +27,13 @@ RSpec.describe Anony::Anonymisable do
           with_strategy(:c_field) { some_instance_method? ? "yes" : "no" }
           with_strategy 321, :d_field
 
+          with_strategy "foo", :missing_field
+
           ignore :ignore_one, :ignore_two
         end
 
         def self.column_names
-          %w[a_field b_field c_field ignore_one ignore_two]
+          %w[a_field b_field c_field d_field ignore_one ignore_two]
         end
 
         alias_method :read_attribute, :send

@@ -228,6 +228,16 @@ irb(main):003:0> temporary.persisted?
 
 Note that it isn't possible to define both anonymisation rules and destruction.
 
+## Adding new columns
+
+Anony will throw an exception if you try to anonymise a model without specifying a
+strategy for all of the columns.  However, it's fine to define a strategy for a column
+that hasn't yet been added.
+
+This means that, in order to add a new column, you should first define a strategy for it,
+and deploy that code change alone.  Once that's done, you can introduce and deploy the
+migration that will add the new column.
+
 ## Configuration
 
 Anony exposes several configuration options on the `Anony::Config` singleton. We

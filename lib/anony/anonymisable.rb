@@ -110,6 +110,7 @@ module Anony
 
     private def anonymise_field(field)
       raise FieldException, field unless self.class.anonymisable_fields.key?(field)
+      return unless self.class.column_names.include?(field.to_s)
 
       strategy = self.class.anonymisable_fields.fetch(field)
       current_value = read_attribute(field)
