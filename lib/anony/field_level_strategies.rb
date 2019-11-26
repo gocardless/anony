@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Anony
-  module Strategies
+  module FieldLevelStrategies
     # Registers a new Anony strategy with a given name. Strategies are then available
     # inside the `anonymise` block.
     #
@@ -13,21 +13,21 @@ module Anony
     #   used as the strategy instead.
     #
     # @example Reversing a string
-    #   Anony::Strategies.register(:reverse) { |value| value.reverse }
+    #   Anony::FieldLevelStrategies.register(:reverse) { |value| value.reverse }
     #
     #   class Manager
     #     anonymise { reverse :first_name }
     #   end
     #
     # @example Using a named strategy class
-    #   Anony::Strategies.register(:classify, Classifier)
+    #   Anony::FieldLevelStrategies.register(:classify, Classifier)
     #
     #   class Manager
     #     anonymise { classify :resource_type }
     #   end
     #
     # @example Using a constant value
-    #   Anony::Strategies.register(:nilable, nil)
+    #   Anony::FieldLevelStrategies.register(:nilable, nil)
     #
     #   class Manager
     #     anonymise { nilable :date_of_birth }
@@ -57,5 +57,55 @@ module Anony
     end
 
     @strategies = {}
+  end
+end
+
+require "securerandom"
+
+Anony::FieldLevelStrategies.register(:email) do
+  sprintf("%<random>s@example.com", random: SecureRandom.uuid)
+end
+
+Anony::FieldLevelStrategies.register(:phone_number, "+1 617 555 1294")
+
+Anony::FieldLevelStrategies.register(:current_datetime) do |_original|
+  current_time_from_proper_timezone
+end
+
+Anony::FieldLevelStrategies.register(:nilable) { nil }
+
+Anony::FieldLevelStrategies.register(:no_op) { |value| value }
+
+module Anony
+  module Strategies
+    # This class curries the max_length into itself so it exists as a parameterless block
+    # that can be called by Anony.
+    #
+    # @example Direct usage:
+    #   anonymise do
+    #     fields do
+    #       with_strategy(OverwriteHex.new(20), :field, :field)
+    #     end
+    #   end
+    #
+    # @example Helper method, assumes length = 36
+    #   anonymise do
+    #     fields do
+    #       hex :field
+    #     end
+    #   end
+    #
+    # @example Helper method with explicit length
+    #   anonymise do
+    #     fields do
+    #       hex :field, max_length: 20
+    #     end
+    #   end
+    OverwriteHex = Struct.new(:max_length) do
+      def call(_existing_value)
+        hex_length = max_length / 2 + 1
+        SecureRandom.hex(hex_length)[0, max_length]
+      end
+    end
   end
 end

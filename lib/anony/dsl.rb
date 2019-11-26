@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "strategies"
+require_relative "field_level_strategies"
 
 module Anony
   # The interface for configuring strategies. All of the methods here are made available
@@ -13,7 +13,7 @@ module Anony
   #     with_strategy(:last_name) { "last-#{id}" }
   #   end
   class DSL
-    include Strategies
+    include FieldLevelStrategies
 
     # @!visibility private
     def initialize
@@ -91,7 +91,7 @@ module Anony
                              "(fields already ignored in Anony::Config)"
       end
 
-      with_strategy(Strategies::NoOp, *fields)
+      no_op(*fields)
     end
 
     # Use the deletion strategy instead of anonymising individual fields. This method is

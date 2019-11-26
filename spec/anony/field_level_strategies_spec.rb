@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::Strategies do
+RSpec.describe Anony::FieldLevelStrategies do
   describe ".register" do
     let(:name) { :reverse }
 
@@ -75,5 +75,55 @@ RSpec.describe Anony::Strategies do
         expect { described_class[:whatever] }.to raise_error(ArgumentError, /whatever/)
       end
     end
+  end
+
+  describe ":email strategy" do
+    subject(:result) { described_class[:email].call(value) }
+
+    let(:value) { "old value" }
+
+    it { is_expected.to match(/^[0-9a-f\-]+@example.com$/) }
+  end
+
+  describe ":phone_number strategy" do
+    subject(:result) { described_class[:phone_number] }
+
+    it { is_expected.to eq("+1 617 555 1294") }
+  end
+
+  describe ":current_datetime strategy" do
+    subject(:result) do
+      model.instance_exec(&described_class[:current_datetime])
+    end
+
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :employees
+      end
+    end
+
+    let(:model) { klass.new }
+
+    let(:value) { "old value" }
+
+    it { is_expected.to be_within(1).of(Time.now) }
+  end
+
+  describe ":nilable strategy" do
+    subject(:result) { described_class[:nilable].call(value) }
+
+    let(:value) { "old value" }
+
+    it { is_expected.to be nil }
+  end
+
+  describe ":no_op strategy" do
+    subject(:result) { described_class[:no_op].call(value) }
+
+    let(:value) { "old value" }
+
+    it { is_expected.to be value }
   end
 end

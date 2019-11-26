@@ -72,11 +72,11 @@ The default strategies include:
 ### Custom strategies
 
 You can override the default strategies, or add your own ones to make them available
-everywhere, using the `Anony::Strategies.register(name, &block)` method somewhere after
+everywhere, using the `Anony::FieldLevelStrategies.register(name, &block)` method somewhere after
 your application boots:
 
 ```ruby
-Anony::Strategies.register(:reverse) do |original|
+Anony::FieldLevelStrategies.register(:reverse) do |original|
   original.reverse
 end
 
