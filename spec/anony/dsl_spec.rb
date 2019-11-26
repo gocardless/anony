@@ -30,7 +30,7 @@ RSpec.describe Anony::DSL do
       end
 
       it "throws an overwritten_strategy_exception" do
-        expect { config.with_strategy(Anony::Strategies::NoOp, :field) }.
+        expect { config.no_op(:field) }.
           to raise_error(Anony::OverwrittenStrategyException)
       end
     end
@@ -74,7 +74,7 @@ RSpec.describe Anony::DSL do
 
   context "when using dynamic strategies" do
     it "is not possible to override the builtin methods like :destroy" do
-      Anony::Strategies.register(:destroy) { raise "Oops!" }
+      Anony::FieldLevelStrategies.register(:destroy) { raise "Oops!" }
       expect { config.destroy }.to_not raise_error
     end
   end
