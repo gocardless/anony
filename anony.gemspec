@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop", "~> 0.76"
   spec.add_development_dependency "yard", "~> 0.9.20"
 
-  # For spec/anony/activerecord_spec.rb
+  # For integration testing
   spec.add_development_dependency "activerecord", "~> 6.0.1"
   spec.add_development_dependency "sqlite3", "~> 1.4.1"
 
