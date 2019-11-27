@@ -9,6 +9,7 @@
 RSpec/LeakyConstantDeclaration:
   Exclude:
     - 'spec/anony/anonymisable_spec.rb'
+    - 'spec/anony/strategies/fields_spec.rb'
 
 RSpec/ExampleLength:
   Exclude:

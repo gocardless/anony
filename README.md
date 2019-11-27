@@ -43,9 +43,11 @@ class Employee < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    hex :first_name, max_length: 12
-    nilable :middle_name
-    ignore :id
+    fields do
+      hex :first_name, max_length: 12
+      nilable :middle_name
+      ignore :id
+    end
   end
 end
 ```
@@ -84,7 +86,9 @@ class Employee < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    reverse :first_name
+    fields do
+      reverse :first_name
+    end
   end
 end
 ```
@@ -113,7 +117,9 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    with_strategy OverwriteUUID, :id
+    fields do
+      with_strategy OverwriteUUID, :id
+    end
   end
 end
 ```
@@ -126,7 +132,9 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    with_strategy 123, :id
+    fields do
+      with_strategy 123, :id
+    end
   end
 end
 ```
@@ -151,8 +159,10 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    with_strategy(:first_name) { |name| Digest::SHA2.hexdigest(name) }
-    with_strategy(:last_name) { "previous-name-of-#{id}" }
+    fields do
+      with_strategy(:first_name) { |name| Digest::SHA2.hexdigest(name) }
+      with_strategy(:last_name) { "previous-name-of-#{id}" }
+    end
   end
 end
 ```

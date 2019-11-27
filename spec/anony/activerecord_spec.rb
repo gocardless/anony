@@ -16,13 +16,15 @@ RSpec.context "ActiveRecord integration" do
       self.table_name = :employees
 
       anonymise do
-        ignore :id
-        hex :first_name
-        nilable :last_name
-        email :email_address
-        phone_number :phone_number
-        current_datetime :onboarded_at
-        with_strategy(:company_name) { |old| "anonymised-#{old}" }
+        fields do
+          ignore :id
+          hex :first_name
+          nilable :last_name
+          email :email_address
+          phone_number :phone_number
+          current_datetime :onboarded_at
+          with_strategy(:company_name) { |old| "anonymised-#{old}" }
+        end
       end
     end
   end

@@ -42,7 +42,7 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
       <<~RUBY
         class Employee < ApplicationRecord
           anonymise do
-            hex :first_name
+            destroy
           end
         end
       RUBY
