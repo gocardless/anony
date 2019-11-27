@@ -2,8 +2,15 @@
 
 require "spec_helper"
 
-RSpec.describe Anony::DSL do
-  let(:config) { described_class.new }
+RSpec.describe Anony::Strategies::Fields do
+  module StubAnoynmiser
+    def self.call(*_)
+      "OVERWRITTEN DATA"
+    end
+  end
+
+  let(:model_klass) { double }
+  let(:config) { described_class.new(model_klass) }
 
   describe "#with_strategy" do
     context "no arguments" do
@@ -73,9 +80,11 @@ RSpec.describe Anony::DSL do
   end
 
   context "when using dynamic strategies" do
-    it "is not possible to override the builtin methods like :destroy" do
-      Anony::FieldLevelStrategies.register(:destroy) { raise "Oops!" }
-      expect { config.destroy }.to_not raise_error
+    before { allow(model_klass).to receive(:column_names).and_return([]) }
+
+    it "is not possible to override the builtin methods like :valid?" do
+      Anony::FieldLevelStrategies.register(:valid?) { raise "Oops!" }
+      expect { config.valid? }.to_not raise_error
     end
   end
 end

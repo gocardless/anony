@@ -13,8 +13,10 @@ module RuboCop
       # @example Good
       #   class User < ApplicationRecord
       #     anonymise do
-      #       email :email
-      #       hex :given_name
+      #       fields do
+      #         email :email
+      #         hex :given_name
+      #       end
       #     end
       #   end
       #

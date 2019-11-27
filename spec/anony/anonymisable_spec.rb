@@ -18,15 +18,17 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :employees
 
         anonymise do
-          ignore :id
-          with_strategy StubAnoynmiser, :company_name
-          with_strategy(:first_name) { |v, _| v.reverse }
-          with_strategy(:last_name) { some_instance_method? ? "yes" : "no" }
-          with_strategy "none@example.com", :email_address
+          fields do
+            ignore :id
+            with_strategy StubAnoynmiser, :company_name
+            with_strategy(:first_name) { |v, _| v.reverse }
+            with_strategy(:last_name) { some_instance_method? ? "yes" : "no" }
+            with_strategy "none@example.com", :email_address
 
-          with_strategy "foo", :missing_field
+            with_strategy "foo", :missing_field
 
-          ignore :phone_number, :onboarded_at
+            ignore :phone_number, :onboarded_at
+          end
         end
 
         def some_instance_method?
@@ -40,7 +42,7 @@ RSpec.describe Anony::Anonymisable do
     end
 
     describe "#anonymise!" do
-      it "anoynmises fields" do
+      it "anonymises fields" do
         expect { model.anonymise! }.
           to change(model, :company_name).to("OVERWRITTEN DATA").
           and change(model, :first_name).to("cba").
@@ -107,7 +109,9 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :employees
 
         anonymise do
-          with_strategy StubAnoynmiser, :first_name
+          fields do
+            with_strategy StubAnoynmiser, :first_name
+          end
         end
       end
     end
@@ -147,34 +151,51 @@ RSpec.describe Anony::Anonymisable do
     end
   end
 
-  context "when a strategy is specified after destroy" do
+  context "with an empty anonymise block" do
     it "throws an exception" do
       klass = Class.new(ActiveRecord::Base) do
         include Anony::Anonymisable
 
-        anonymise do
-          destroy
-        end
+        anonymise
       end
 
-      expect { klass.anonymise { nilable :a_field } }.to raise_error(
-        ArgumentError, "Can't specify destroy and strategies for fields"
+      expect { klass.anonymise_config.validate! }.
+        to raise_error(ArgumentError, "Must specify either :destroy or :fields strategy")
+    end
+  end
+
+  context "when trying to define :fields after :destroy" do
+    it "throws an exception" do
+      expect do
+        Class.new(ActiveRecord::Base) do
+          include Anony::Anonymisable
+
+          anonymise do
+            destroy
+            fields { nilable :a_field }
+          end
+        end
+      end.to raise_error(
+        ArgumentError, "Cannot specify :fields when another strategy already defined"
       )
     end
   end
 
-  context "when a strategy is specified before destroy" do
+  context "when trying to define :fields before :destroy" do
     it "throws an exception" do
-      klass = Class.new(ActiveRecord::Base) do
-        include Anony::Anonymisable
+      expect do
+        Class.new(ActiveRecord::Base) do
+          include Anony::Anonymisable
 
-        anonymise do
-          nilable :first_name
+          anonymise do
+            fields do
+              nilable :first_name
+            end
+            destroy
+          end
         end
-      end
-
-      expect { klass.anonymise { destroy } }.to raise_error(
-        ArgumentError, "Can't specify destroy and strategies for fields"
+      end.to raise_error(
+        ArgumentError, "Cannot specify :destroy when another strategy already defined"
       )
     end
   end
@@ -187,13 +208,15 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :employees
 
         anonymise do
-          ignore :id
-          hex :first_name
-          nilable :last_name
-          email :email_address
-          phone_number :phone_number
-          current_datetime :onboarded_at
-          with_strategy(:company_name) { |old| "anonymised-#{old}" }
+          fields do
+            ignore :id
+            hex :first_name
+            nilable :last_name
+            email :email_address
+            phone_number :phone_number
+            current_datetime :onboarded_at
+            with_strategy(:company_name) { |old| "anonymised-#{old}" }
+          end
         end
       end
     end
@@ -226,7 +249,7 @@ RSpec.describe Anony::Anonymisable do
         include Anony::Anonymisable
       end
 
-      expect { klass.anonymise { ignore :id } }.to raise_error(
+      expect { klass.anonymise { fields { ignore :id } } }.to raise_error(
         ArgumentError, "Cannot ignore [:id] (fields already ignored in Anony::Config)"
       )
     end
@@ -236,6 +259,8 @@ RSpec.describe Anony::Anonymisable do
         include Anony::Anonymisable
 
         self.table_name = :only_ids
+
+        anonymise { fields {} }
       end
 
       expect(klass).to be_valid_anonymisation
@@ -250,7 +275,9 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :a_fields
 
         anonymise do
-          with_strategy StubAnoynmiser, :a_field
+          fields do
+            with_strategy StubAnoynmiser, :a_field
+          end
         end
       end
     end
@@ -262,17 +289,16 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :a_fields
 
         anonymise do
-          with_strategy("foo", :a_field)
+          fields do
+            with_strategy("foo", :a_field)
+          end
         end
       end
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it "models do not leak configuration" do
       #  We had a case where these leaked, so we want to explicitly test it.
-      expect(a_class.anonymisable_fields).to match(a_field: StubAnoynmiser)
-      expect(b_class.anonymisable_fields).to match(a_field: "foo")
+      expect(a_class.anonymise_config).to_not eq(b_class.anonymise_config)
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 end

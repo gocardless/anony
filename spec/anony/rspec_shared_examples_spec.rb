@@ -12,7 +12,9 @@ RSpec.describe "RSpec shared examples" do
       self.table_name = :a_fields
 
       anonymise do
-        hex :a_field
+        fields do
+          hex :a_field
+        end
       end
     end
 
