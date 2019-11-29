@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "gc_ruboconfig", "~> 2.8.0"
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "rspec_junit_formatter", "~> 0.4"
-  spec.add_development_dependency "rubocop", "~> 0.76"
   spec.add_development_dependency "yard", "~> 0.9.20"
 
   # For integration testing
