@@ -37,12 +37,12 @@ RSpec.context "ActiveRecord integration" do
       and change(instance, :email_address).to(/[\h\-]@example.com/).
       and change(instance, :phone_number).to("+1 617 555 1294").
       and change(instance, :company_name).to("anonymised-Microsoft").
-      and change(instance, :onboarded_at).to be_within(1).of(Time.zone.now)
+      and change(instance, :onboarded_at).to be_within(1).of(Time.now)
   end
   # rubocop:enable RSpec/ExampleLength
 
   it "sets the anonymised_at column" do
     expect { instance.anonymise! }.
-      to change(instance, :anonymised_at).from(nil).to be_within(1).of(Time.zone.now)
+      to change(instance, :anonymised_at).from(nil).to be_within(1).of(Time.now)
   end
 end

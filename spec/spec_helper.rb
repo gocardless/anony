@@ -11,6 +11,3 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
-
-# To support :current_time strategy
-Time.zone = "UTC"

@@ -96,7 +96,7 @@ module Anony
       anonymise_configured_fields
 
       if self.class.column_names.include?(ANONYMISED_AT.to_s)
-        write_attribute(ANONYMISED_AT, Strategies[:current_datetime].call)
+        write_attribute(ANONYMISED_AT, current_time_from_proper_timezone)
       end
 
       save!
