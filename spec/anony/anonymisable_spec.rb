@@ -101,6 +101,50 @@ RSpec.describe Anony::Anonymisable do
     end
   end
 
+  context "preventing anonymisation" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :only_ids
+
+        anonymise do
+          destroy
+          skip_if { true }
+        end
+      end
+    end
+
+    let!(:model) { klass.create! }
+
+    describe "#anonymise!" do
+      it "returns :skipped" do
+        expect { model.anonymise! }.to raise_error(Anony::SkippedException)
+      end
+    end
+
+    context "when the condition does not match" do
+      let(:klass) do
+        Class.new(ActiveRecord::Base) do
+          include Anony::Anonymisable
+
+          self.table_name = :only_ids
+
+          anonymise do
+            destroy
+            skip_if { false }
+          end
+        end
+      end
+
+      describe "#anonymise!" do
+        it "destroys the model" do
+          expect { model.anonymise! }.to change(klass, :count).by(-1)
+        end
+      end
+    end
+  end
+
   context "without defining a strategy for core fields" do
     let(:klass) do
       Class.new(ActiveRecord::Base) do
