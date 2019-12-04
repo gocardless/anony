@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "../helpers/database"
 
 RSpec.describe Anony::Strategies::Fields do
   module StubAnoynmiser
@@ -76,6 +77,25 @@ RSpec.describe Anony::Strategies::Fields do
         config.with_strategy(StubAnoynmiser, :foo, :bar)
         expect(config.anonymisable_fields).to eq(foo: StubAnoynmiser, bar: StubAnoynmiser)
       end
+    end
+  end
+
+  describe "#apply" do
+    let(:model_klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :only_anonymised
+        anonymise do
+          fields { ignore :id }
+        end
+      end
+    end
+
+    let(:instance) { model_klass.new }
+
+    it "idempotently attaches the anonymised_at rule once" do
+      3.times { config.apply(instance) }
     end
   end
 
