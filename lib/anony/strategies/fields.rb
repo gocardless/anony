@@ -45,7 +45,10 @@ module Anony
       #
       # @param [ActiveRecord::Base] instance An instance of the model
       def apply(instance)
-        current_datetime(:anonymised_at) if @model_class.column_names.include?("anonymised_at")
+        if !@anonymisable_fields.key?(:anonymised_at) &&
+            @model_class.column_names.include?("anonymised_at")
+          current_datetime(:anonymised_at)
+        end
 
         @anonymisable_fields.each_key do |field|
           anonymise_field(instance, field)
@@ -136,7 +139,6 @@ module Anony
       end
 
       private def anonymise_field(instance, field)
-        raise unless valid?
         return unless @model_class.column_names.include?(field.to_s)
 
         strategy = @anonymisable_fields.fetch(field)

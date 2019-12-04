@@ -26,4 +26,8 @@ ActiveRecord::Schema.define do
   create_table :a_fields, id: false do |t|
     t.string :a_field
   end
+
+  create_table :only_anonymised do |t|
+    t.datetime :anonymised_at
+  end
 end
