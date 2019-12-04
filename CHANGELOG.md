@@ -1,3 +1,10 @@
+# v0.7.0
+
+* **BREAKING** Switch to nesting field-level configuration in a `fields` block
+  [#32](https://github.com/gocardless/anony/pull/32). This should just be a case of
+  switching `anonymise { ... }` to `anonymise { fields { ... } }` in most cases, but for
+  more details please check the README.
+
 # v0.6.0
 
 * Use ActiveRecord::Persistence#current_time_from_proper_timezone [#34](https://github.com/gocardless/anony/pull/34)
