@@ -1,3 +1,7 @@
+# v0.7.2
+
+* Add ability to prevent anonymisation with `skip_if` [#25](https://github.com/gocardless/anony/pull/25)
+
 # v0.7.1
 
 * Fix breakage when applying a strategy multiple times [#35](https://github.com/gocardless/anony/pull/35)
