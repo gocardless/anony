@@ -1,9 +1,14 @@
+# v0.7.1
+
+* Fix breakage when applying a strategy multiple times [#35](https://github.com/gocardless/anony/pull/35)
+
 # v0.7.0
 
 * **BREAKING** Switch to nesting field-level configuration in a `fields` block
   [#32](https://github.com/gocardless/anony/pull/32). This should just be a case of
   switching `anonymise { ... }` to `anonymise { fields { ... } }` in most cases, but for
   more details please check the README.
+* **BREAKING** `Anony::Strategies.register` was renamed to `Anony::FieldLevelStrategies.register`.
 
 # v0.6.0
 
