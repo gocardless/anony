@@ -61,6 +61,7 @@ module Anony
     #
     # @return [true] if the save was successful
     # @raise [FieldException] if the configuration is invalid (configuration is lazily validated)
+    # @raise [SkippedException] if the skip_if condition matched
     # @raise [ActiveRecord::RecordNotSaved] if the save failed (e.g. a validation error)
     # @raise [ActiveRecord::RecordNotDestroyed] if the destroy failed (where this strategy
     #   has been configured)

@@ -27,10 +27,21 @@ module Anony
     def initialize(model_class, &block)
       @model_class = model_class
       @strategy = UndefinedStrategy.new
+      @skip_filter = nil
       instance_exec(&block) if block_given?
     end
 
-    delegate :valid?, :validate!, :apply, to: :@strategy
+    # Internal. Applies the given strategy, taking into account any filters or conditions.
+    #
+    # @example
+    #   Anony::ModelConfig.new(Manager).apply(Manager.new)
+    def apply(instance)
+      raise Anony::SkippedException if @skip_filter && instance.instance_exec(&@skip_filter)
+
+      @strategy.apply(instance)
+    end
+
+    delegate :valid?, :validate!, to: :@strategy
 
     # Use the deletion strategy instead of anonymising individual fields. This method is
     # incompatible with the fields strategy.
@@ -70,6 +81,19 @@ module Anony
       end
 
       @strategy = Strategies::Fields.new(@model_class, &block)
+    end
+
+    # Prevent any anonymisation strategy being applied when the provided block evaluates
+    # to true. The block is executed in the model context.
+    #
+    # @example
+    #   anonymise do
+    #     skip_if { !persisted? }
+    #   end
+    def skip_if(&if_condition)
+      raise ArgumentError, "Block required for :skip_if" unless block_given?
+
+      @skip_filter = if_condition
     end
   end
 end

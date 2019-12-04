@@ -238,6 +238,27 @@ irb(main):003:0> temporary.persisted?
 
 Note that it isn't possible to define both anonymisation rules and destruction.
 
+### Preventing anonymisation
+
+You might have a need to preserve model data in some (or all) circumstances. Anony exposes
+the `skip_if` DSL for expressing this preference, which runs the given block before
+attempting any further strategy.
+
+* If the block returns truthy, anonymisation is skipped and `Anony::SkippedException` is thrown.
+* If the block returns falsey, anonymisation continues.
+
+```ruby
+class Manager
+  def should_not_be_anonymised?
+    true
+  end
+
+  anonymise do
+    skip_if { should_not_be_anonymised? } # Will not be anonymised
+  end
+end
+```
+
 ## Adding new columns
 
 Anony will throw an exception if you try to anonymise a model without specifying a
