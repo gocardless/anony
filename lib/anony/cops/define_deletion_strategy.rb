@@ -26,19 +26,27 @@ module RuboCop
         MSG = "Define .anonymise for %<model>s, see https://github.com/gocardless/" \
               "anony/blob/#{Anony::VERSION}/README.md for details"
 
-        def_node_matcher :only_models, <<~PATTERN
-          (class
-            (const _ $_)
-            (const nil? :ApplicationRecord)
-          ...)
-        PATTERN
-
-        def_node_search :uses_anonymise?, "(send _ :anonymise)"
+        def_node_search :uses_anonymise?, "(send nil? :anonymise)"
 
         def on_class(node)
-          only_models(node) do |model|
-            add_offense(node, message: sprintf(MSG, model: model)) unless uses_anonymise?(node)
-          end
+          return unless model?(node)
+          return if uses_anonymise?(node)
+
+          add_offense(node, message: sprintf(MSG, model: class_name(node)))
+        end
+
+        def model?(node)
+          return unless (superclass = node.children[1])
+
+          superclass.const_name == model_superclass_name
+        end
+
+        def class_name(node)
+          node.children[0].const_name
+        end
+
+        def model_superclass_name
+          cop_config["ModelSuperclass"] || "ApplicationRecord"
         end
       end
     end

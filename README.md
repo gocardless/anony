@@ -358,6 +358,14 @@ class Employee < ApplicationRecord ...
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ```
 
+If your models do not inherit from `ApplicationRecord`, you can specify their superclass
+in your `.rubocop.yml`:
+
+```yml
+Lint/DefineDeletionStrategy:
+  ModelSuperclass: Acme::Record
+```
+
 ## License & Contributing
 
 * Anony is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
