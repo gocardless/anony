@@ -1,3 +1,7 @@
+# v0.7.3
+
+* Allow customising the model superclass for the `DefineDeletionStrategy` cop [#36](https://github.com/gocardless/anony/pull/36)
+
 # v0.7.2
 
 * Add ability to prevent anonymisation with `skip_if` [#25](https://github.com/gocardless/anony/pull/25)
