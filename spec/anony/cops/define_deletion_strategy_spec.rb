@@ -8,7 +8,11 @@ require "anony/cops/define_deletion_strategy"
 RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
   include CopHelper
 
-  let(:cop) { described_class.new }
+  let(:cop) { described_class.new(config) }
+
+  let(:config) { RuboCop::Config.new(described_class.cop_name => cop_config) }
+
+  let(:cop_config) { {} }
 
   before { inspect_source(source) }
 
@@ -52,6 +56,20 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
   end
 
   context "when a model does not define anonymisation rules" do
+    shared_examples_for "an offense" do
+      it { expect(offenses.count).to eq(1) }
+
+      it "has the correct name" do
+        expect(offenses.first.cop_name).to eq(cop.name)
+      end
+
+      it "has the correct message" do
+        expect(offenses.first.message).
+          to eq("Define .anonymise for Employee, see https://github.com/gocardless/anony/" \
+                "blob/#{Anony::VERSION}/README.md for details")
+      end
+    end
+
     subject(:offenses) { cop.offenses }
 
     let(:source) do
@@ -61,16 +79,19 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
       RUBY
     end
 
-    it { expect(offenses.count).to eq(1) }
+    it_behaves_like "an offense"
 
-    it "has the correct name" do
-      expect(offenses.first.cop_name).to eq(cop.name)
-    end
+    context "with a custom model superclasss" do
+      let(:cop_config) { { "ModelSuperclass" => "Acme::Record" } }
 
-    it "has the correct message" do
-      expect(offenses.first.message).
-        to eq("Define .anonymise for Employee, see https://github.com/gocardless/anony/" \
-              "blob/#{Anony::VERSION}/README.md for details")
+      let(:source) do
+        <<~RUBY
+          class Employee < Acme::Record
+          end
+        RUBY
+      end
+
+      it_behaves_like "an offense"
     end
   end
 end
