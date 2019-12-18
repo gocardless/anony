@@ -7,6 +7,7 @@ require_relative "./strategies/fields"
 
 module Anony
   class ModelConfig
+    # @api private
     class UndefinedStrategy
       def valid?
         false
@@ -17,7 +18,8 @@ module Anony
       end
     end
 
-    # Internal. Constructs a new instance of ModelConfig.
+    # @api private
+    # Constructs a new instance of ModelConfig.
     #
     # @param [ActiveRecord::Base] model_class The model class the config is attached to.
     # @yield [block] For configuration of the ModelConfig instance.
@@ -31,7 +33,8 @@ module Anony
       instance_exec(&block) if block_given?
     end
 
-    # Internal. Applies the given strategy, taking into account any filters or conditions.
+    # @api private
+    # Applies the given strategy, taking into account any filters or conditions.
     #
     # @example
     #   Anony::ModelConfig.new(Manager).apply(Manager.new)
