@@ -10,12 +10,18 @@ module Anony
     #     destroy
     #   end
     class Destroy
-      # This strategy takes no configuration so #valid? always returns true
+      # Whether the strategy is valid. This strategy takes no configuration, so #valid?
+      # always returns true
+      #
+      # @return [true]
       def valid?
         true
       end
 
-      # This strategy takes no configuration so #validate! always returns true
+      # Whether the strategy is valid, raising an exception if not. This strategy takes no
+      # configuration, so #validate! always returns true
+      #
+      # @return [true]
       def validate!
         true
       end

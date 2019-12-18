@@ -1,7 +1,26 @@
 # Anony
 
-> Anony is a small library that defines how ActiveRecord models should be anonymised for
-> deletion purposes.
+Anony is a small library that defines how ActiveRecord models should be anonymised for
+deletion purposes.
+
+```ruby
+class User < ActiveRecord::Base
+  include Anony::Anonymisable
+
+  anonymise do
+    fields do
+      hex :first_name
+    end
+  end
+end
+```
+```ruby
+irb(main):001:0> user = User.find(1)
+=> #<User id="1" first_name="Alice">
+
+irb(main):002:0> user.anonymise!
+ => #<User id="1" first_name="874cb84f6d9129f33a40ad5298448305">
+```
 
 ## Installation & configuration
 
@@ -11,71 +30,100 @@ This library is distributed as a Ruby gem, and we recommend adding it your Gemfi
 gem "anony"
 ```
 
-If you have a Rails application, you might wish to get anonymisable behaviour for all
-models:
+The library injects itself using a mixin. To add this to a model class, you should include
+`Anony::Anonymisable`:
+
+```ruby
+class User < ActiveRecord::Base
+  include Anony::Anonymisable
+  # ...
+end
+```
+
+Alternatively, if you have a Rails application, you might wish to expose this behaviour
+for all of your models: in which case, you can instead add it to `ApplicationRecord` once:
 
 ```ruby
 # app/models/application_record.rb
 class ApplicationRecord < ActiveRecord::Base
   include Anony::Anonymisable
-  # ...
-end
-```
-
-Alternatively, you can just mix it into models as needed:
-
-```ruby
-class User < ApplicationRecord
-  include Anony::Anonymisable
-  # ...
 end
 ```
 
 ## Usage
 
-The main idea is that you define which fields on a model should be anonymised and,
-crucially, which ones should not. This means that when you're adding a new column to an
-anonymisable model, you will be reminded that you need to define the anonymisation
-strategy for that column.
+There are two primary ways to use this library: to either overwrite existing fields on a
+record, or to destroy the record altogether.
+
+First, you should establish an `anonymise` block in your model class:
 
 ```ruby
-class Employee < ApplicationRecord
+class Employee < ActiveRecord::Base
   include Anony::Anonymisable
 
   anonymise do
-    fields do
-      hex :first_name, max_length: 12
-      nilable :middle_name
-      ignore :id
-    end
   end
 end
 ```
 
-```
-irb(main):001:0> employee = Employee.find(1)
- => #≤Employee id="1" first_name="Alice" middle_name="in">
+If you want to overwrite certain fields on the model, you should use the `fields`
+DSL. There are many different ways (known as "strategies") to overwrite your fields (see
+[Field strategies](#field-strategies) below). For now, let's use the `hex` & `nilable` strategies, which
+overwrites fields using `SecureRandom.hex` or sets them to `nil`:
 
-irb(main):002:0> employee.anonymise!
+```ruby
+anonymise do
+  fields do
+    hex :field_name
+    nilable :nullable_field
+  end
+end
+```
+
+Alternative, you may wish to simply destroy the record altogether when we call
+`#anonymise!` (this is useful if you're anonymising a collection of different models
+together, only some of which need to be destroyed). This can be configured liked so:
+
+```ruby
+anonymise do
+  destroy
+end
+```
+
+Please note that both the `fields` and `destroy` strategies cannot be used simultaneously.
+
+Now, given a model instance, we can use the `#anonymise!` method to apply our strategies:
+
+```ruby
+irb(main):001:0> model = Model.find(1)
+=> #<Model id="1" field_name="Previous value" nullable_field="Previous">
+
+irb(main):002:0> model.anonymise!
+ => #<Model id="1" field_name="5f875d4aaf43b1fd57f1ec88ff215ba7" nullable_field=nil>
+ ```
+
+ Or, if you were using the `destroy` strategy:
+
+ ```ruby
+ irb(main):002:0> model.anonymise!
  => true
+ ```
 
-irb(main):003:0> employee
- => #≤Employee id="1" first_name="bf2eb0fec2ac" middle_name=nil>
-```
+### Field strategies
 
-The default strategies include:
+This library ships with a number of built-in strategies:
 
-* **nilable**, overwrites the field with `nil`
-* **hex**, overwrites the field with random hexadecimal characters
-* **email**, overwrites the field with an email
-* **phone_number**, overwrites the field with a dummy phone number
-* **current_datetime**, overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
+  * **nilable** overwrites the field with `nil`
+  * **hex** overwrites the field with random hexadecimal characters
+  * **email** overwrites the field with an email
+  * **phone_number** overwrites the field with a dummy phone number
+  * **current_datetime** overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
 
 ### Custom strategies
 
 You can override the default strategies, or add your own ones to make them available
 everywhere, using the `Anony::FieldLevelStrategies.register(name, &block)` method somewhere after
-your application boots:
+your application boots (e.g. in a Rails initializer):
 
 ```ruby
 Anony::FieldLevelStrategies.register(:reverse) do |original|
@@ -150,8 +198,8 @@ irb(main):003:0> manager
  => #<Manager id=123>
 ```
 
-You can also use a block. Blocks are executed in the context of the model so they can
-access local properties & methods, and they take the existing value of the column as the
+You can also use a block, which is executed in the context of the model so it can
+access local properties & methods. Blocks take the existing value of the column as the
 only argument:
 
 ```ruby
@@ -180,16 +228,14 @@ irb(main):003:0> manager
 
 ### Identifying anonymised records
 
-If your model has an `anonymised_at` column, anony will automatically set that value when
-calling `#anonymise!` (similar to how Rails will modify the `updated_at` timestamp). This
-means you could automatically filter out anonymised records without matching on the
+If your model has an `anonymised_at` column, Anony will automatically set that value
+when calling `#anonymise!` (similar to how Rails will modify the `updated_at` timestamp).
+This means you could automatically filter out anonymised records without matching on the
 anonymised values.
 
 Here is an example of adding this column with new tables:
 
 ```ruby
-# When creating the new table:
-
 class AddEmployees < ActiveRecord::Migration[6.0]
   def change
     create_table(:employees) do |t|
@@ -210,69 +256,77 @@ class AddAnonymisedAtToEmployees < ActiveRecord::Migration[6.0]
 end
 ```
 
-### Destroying instead of anonymising
-
-There are some models which should be destroyed as part of anonymisation (because when
-anonymised they bring no value). This can be done using the `destroy` method:
+Records can then be filtered out like so:
 
 ```ruby
-class Temporary < ApplicationRecord
-  include Anony::Anonymisable
-
-  anonymise do
-    destroy
-  end
+class Employees < ApplicationRecord
+  scope :without_anonymised, -> { where(anonymised_at: nil) }
 end
 ```
-
-```
-irb(main):001:0> temporary = Temporary.first
- => #<Temporary id=42>
-
-irb(main):002:0> temporary.anonymise!
- => true
-
-irb(main):003:0> temporary.persisted?
- => false
-```
-
-Note that it isn't possible to define both anonymisation rules and destruction.
 
 ### Preventing anonymisation
 
 You might have a need to preserve model data in some (or all) circumstances. Anony exposes
 the `skip_if` DSL for expressing this preference, which runs the given block before
-attempting any further strategy.
+attempting any strategy.
 
-* If the block returns truthy, anonymisation is skipped and `Anony::SkippedException` is thrown.
-* If the block returns falsey, anonymisation continues.
+* If the block returns _truthy_, anonymisation is skipped and `Anony::SkippedException` is thrown.
+* If the block returns _falsey_, anonymisation continues.
 
 ```ruby
 class Manager
   def should_not_be_anonymised?
-    true
+    id == 1 # The first manager must be kept
   end
 
   anonymise do
-    skip_if { should_not_be_anonymised? } # Will not be anonymised
+    skip_if { should_not_be_anonymised? }
   end
 end
 ```
 
-## Adding new columns
+```
+irb(main):001:0> manager = Manager.find(1)
+ => #<Manager id=1>
+
+irb(main):002:0> manager.anonymise!
+ => Anony::SkippedException("Anonymisation skipped due to matching skip_if filter")
+```
+
+## Incomplete field strategies
+
+One of the goals of this library is to ensure that your field strategies are _complete_,
+i.e. that the anonymisation behaviour of the model is always correct, even when database
+columns are added/removed or the contents of those columns changes.
+
+As such, Anony will validate your model configuration when you try to anonymise the
+model (unfortunately this cannot be safely done at boot as the database might not be
+available). If your configuration is incomplete, calling `#anonymise!` will raise a
+`FieldsException` and warn which fields are missing.
+
+We recommend adding a test for each model that you anonymise (see [Testing](#testing)
+below).
+
+### Adding new columns
 
 Anony will throw an exception if you try to anonymise a model without specifying a
-strategy for all of the columns.  However, it's fine to define a strategy for a column
+strategy for all of the columns (to ensure that anonymisation rules aren't missed over
+time). However, it's fine to define a strategy for a column
 that hasn't yet been added.
 
-This means that, in order to add a new column, you should first define a strategy for it,
-and deploy that code change alone.  Once that's done, you can introduce and deploy the
-migration that will add the new column.
+This means that, in order to add a new column, you should:
 
-## Configuration
+  1. Define a strategy for the new column (e.g. `nilable :new_column`)
+  2. Add the column in a database migration.
 
-Anony exposes several configuration options on the `Anony::Config` singleton. We
-recommend making these changes in an initializer if needed:
+> At GoCardless we do zero-downtime deploys so we would deploy the first change before
+> then deploying the migration.
+
+### Excluding common Rails columns
+
+Rails applications typically have an `id`, `created_at` and `updated_at` column on all new
+tables by default. To avoid anonymising these fields (and thus prevent a
+`FieldsException`), they can be globally ignored:
 
 ```ruby
 # config/initializers/anony.rb
@@ -280,26 +334,10 @@ recommend making these changes in an initializer if needed:
 Anony::Config.ignore_fields(:id, :created_at, :updated_at)
 ```
 
-### `.ignore_fields`
-
-Globally permit common column names (for example, `id`, `created_at` and `updated_at` in
-Rails applications often appear by default in all models). By default, there are no
-columns in this list (`[]`).
+By default, `Config.ignore_fields` is an empty array and all fields are considered
+anonymisable.
 
 ## Testing
-
-Anony exposes an instance method called `#valid_anonymisation?` which is called before
-anonymisation, but you can also run it yourself in tests to be sure that all fields have been
-correctly defined. A simple spec would be:
-
-```ruby
-RSpec.describe Employee do
-  subject { described_class.new }
-
-  it { is_expected.to be_valid_anonymisation }
-  specify { expect(subject.anonymise!).to eq(true) }
-end
-```
 
 This library ships with a set of useful RSpec examples for your specs. Just require them
 somewhere before running your spec:
@@ -312,7 +350,8 @@ require "anony/rspec_shared_examples"
 # spec/models/employee_spec.rb
 
 RSpec.describe Employee do
-  # We use FactoryBot at GoCardless but however you setup a model instance is fine
+  # We use FactoryBot at GoCardless, but
+  # however you setup a model instance is fine
   subject { FactoryBot.build(:employee) }
 
   # If you just anonymise fields normally
@@ -323,8 +362,8 @@ RSpec.describe Employee do
 end
 ```
 
-You can also override the subject inside the shared example if it helps (e.g. if you need
-to persist the record before anonymising it):
+You can also override the subject _inside_ the shared example if it helps (e.g. if you
+need to persist the record before anonymising it):
 
 ```ruby
 RSpec.describe Employee do
@@ -334,28 +373,38 @@ RSpec.describe Employee do
 end
 ```
 
+If you're not using RSpec, or want more control over the tests, Anony also exposes an
+instance method called `#valid_anonymisation?`. A simple spec would be:
+
+```ruby
+RSpec.describe Employee do
+  subject { described_class.new }
+
+  it { is_expected.to be_valid_anonymisation }
+end
+```
+
 ## Integration with Rubocop
 
-This library includes some Rubocops to ensure consistency in your codebase. Just add the
-following to the `require` list in your `.rubocop.yml`:
+At GoCardless, we use Rubocop heavily to ensure consistency in our applications. This
+library includes some Rubocop cops, which can be used by adding `anony/cops` to the
+`require` list in your `.rubocop.yml`:
 
 ```yml
 require:
   - anony/cops
 ```
 
-You can also require the individual cops if needed, e.g. with
-`anony/cops/define_deletion_strategy`.
-
 ### `Lint/DefineDeletionStrategy`
 
-This cop ensures that all models in your application have defined anonymisation
-rules. The output looks like this:
+This cop ensures that all models in your application have defined an `anonymise` block.
+The output looks like this:
 
 ```
-app/models/employee.rb:7:1: W: Lint/DefineDeletionStrategy: Define .anonymise for Employee, see https://github.com/gocardless/anony/blob/v0.1/README.md for details:
-class Employee < ApplicationRecord ...
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/models/employee.rb:7:1: W: Lint/DefineDeletionStrategy:
+  Define .anonymise for Employee, see https://github.com/gocardless/anony/blob/master/README.md for details:
+  class Employee < ApplicationRecord ...
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ```
 
 If your models do not inherit from `ApplicationRecord`, you can specify their superclass
