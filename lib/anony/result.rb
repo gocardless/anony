@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'active_support'
+require "active_support"
 
 module Anony
   class Result
-    FAILED = 'failed'.freeze
-    DELETED = 'deleted'.freeze
-    ANONYMISED = 'anonymised'.freeze
-    SKIPPED = 'skipped'.freeze
+    FAILED = "failed"
+    DELETED = "deleted"
+    ANONYMISED = "anonymised"
+    SKIPPED = "skipped"
 
     attr_reader :fields, :error
 
@@ -27,16 +27,14 @@ module Anony
       new(DELETED)
     end
 
-    def state
-      @state
-    end
+    attr_reader :status
 
-    delegate :failed?, :anonymised?, :skipped?, :deleted?, to: :state
+    delegate :failed?, :anonymised?, :skipped?, :deleted?, to: :status
 
-    private def initialize(state, fields: {}, error: nil)
-      raise ArgumentError.new('No error provided') if state == FAILED && error.nil?
+    private def initialize(status, fields: {}, error: nil)
+      raise ArgumentError, "No error provided" if status == FAILED && error.nil?
 
-      @state = ActiveSupport::StringInquirer.new(state)
+      @status = ActiveSupport::StringInquirer.new(status)
       @fields = fields
       @error = error
     end
