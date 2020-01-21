@@ -8,7 +8,8 @@ RSpec.shared_examples "anonymisable model" do
   end
 
   it "successfully calls #anonymise!" do
-    expect(subject.anonymise!).to be true
+    result = subject.anonymise!
+    expect(result).not_to be_failed
   end
 end
 
@@ -19,5 +20,10 @@ RSpec.shared_examples "anonymisable model with destruction" do
 
   it "destroys the model" do
     expect { subject.anonymise! }.to change(described_class, :count).by(-1)
+  end
+
+  it "labels the model as destroyed" do
+    result = subject.anonymise!
+    expect(result).to be_deleted
   end
 end

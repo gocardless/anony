@@ -50,11 +50,15 @@ module Anony
           current_datetime(:anonymised_at)
         end
 
+        result_fields = {}
+
         @anonymisable_fields.each_key do |field|
-          anonymise_field(instance, field)
+          result_fields[field.to_sym] = anonymise_field(instance, field)
         end
 
         instance.save!
+
+        Result.anonymised(result_fields)
       end
 
       # Configure a custom strategy for one or more fields. If a block is given that is used

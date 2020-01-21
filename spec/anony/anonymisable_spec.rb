@@ -118,8 +118,9 @@ RSpec.describe Anony::Anonymisable do
     let!(:model) { klass.create! }
 
     describe "#anonymise!" do
-      it "returns :skipped" do
-        expect { model.anonymise! }.to raise_error(Anony::SkippedException)
+      it "skips the record" do
+        result = model.anonymise!
+        expect(result).to be_skipped
       end
     end
 
@@ -170,11 +171,8 @@ RSpec.describe Anony::Anonymisable do
       let(:model) { klass.new }
 
       it "throws an exception" do
-        expect { model.anonymise! }.to raise_error(
-          Anony::FieldException, "Invalid anonymisation strategy for field(s) [" \
-                                 ":id, :last_name, :company_name, :email_address, " \
-                                 ":phone_number, :onboarded_at]"
-        )
+        result = model.anonymise!
+        expect(result.error).to be_an_instance_of(Anony::FieldException)
       end
     end
   end
