@@ -1,46 +1,44 @@
 # frozen_string_literal: true
 
+require 'active_support'
+
 module Anony
   class Result
+    FAILED = 'failed'.freeze
+    DELETED = 'deleted'.freeze
+    ANONYMISED = 'anonymised'.freeze
+    SKIPPED = 'skipped'.freeze
+
     attr_reader :fields, :error
 
     def self.failed(error)
-      new(error: error)
+      new(FAILED, error: error)
     end
 
     def self.anonymised(fields)
-      new(fields: fields)
+      new(ANONYMISED, fields: fields)
     end
 
     def self.skipped
-      new(skipped: true)
+      new(SKIPPED)
     end
 
     def self.deleted
-      new(deleted: true)
+      new(DELETED)
     end
 
-    def failed?
-      error.present?
+    def state
+      @state
     end
 
-    def anonymised?
-      fields.any?
-    end
+    delegate :failed?, :anonymised?, :skipped?, :deleted?, to: :state
 
-    def skipped?
-      @skipped
-    end
+    private def initialize(state, fields: {}, error: nil)
+      raise ArgumentError.new('No error provided') if state == FAILED && error.nil?
 
-    def deleted?
-      @deleted
-    end
-
-    private def initialize(fields: {}, error: nil, skipped: false, deleted: false)
+      @state = ActiveSupport::StringInquirer.new(state)
       @fields = fields
       @error = error
-      @skipped = skipped
-      @deleted = deleted
     end
   end
 end
