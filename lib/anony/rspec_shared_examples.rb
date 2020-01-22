@@ -24,6 +24,6 @@ RSpec.shared_examples "anonymisable model with destruction" do
 
   it "labels the model as destroyed" do
     result = subject.anonymise!
-    expect(result).to be_deleted
+    expect(result).to be_destroyed
   end
 end

@@ -5,8 +5,8 @@ require "active_support"
 module Anony
   class Result
     FAILED = "failed"
-    DELETED = "deleted"
-    ANONYMISED = "anonymised"
+    DESTROYED = "destroyed"
+    OVERWRITTEN = "overwritten"
     SKIPPED = "skipped"
 
     attr_reader :fields, :error
@@ -15,21 +15,21 @@ module Anony
       new(FAILED, error: error)
     end
 
-    def self.anonymised(fields)
-      new(ANONYMISED, fields: fields)
+    def self.overwritten(fields)
+      new(OVERWRITTEN, fields: fields)
     end
 
     def self.skipped
       new(SKIPPED)
     end
 
-    def self.deleted
-      new(DELETED)
+    def self.destroyed
+      new(DESTROYED)
     end
 
     attr_reader :status
 
-    delegate :failed?, :anonymised?, :skipped?, :deleted?, to: :status
+    delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
 
     private def initialize(status, fields: {}, error: nil)
       raise ArgumentError, "No error provided" if status == FAILED && error.nil?

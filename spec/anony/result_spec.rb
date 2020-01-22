@@ -11,26 +11,26 @@ RSpec.describe Anony::Result do
   end
 
   context "anonymised" do
-    let(:result) { described_class.anonymised(field_values) }
+    let(:result) { described_class.overwritten(field_values) }
 
     it "has enumbeable state" do
-      expect(result.status).to eq("anonymised")
+      expect(result.status).to eq("overwritten")
     end
 
-    it "responds to .anonymied?" do
-      expect(result).to be_anonymised
+    it "responds to .overwritten?" do
+      expect(result).to be_overwritten
     end
   end
 
   context "deleted" do
-    let(:result) { described_class.deleted }
+    let(:result) { described_class.destroyed }
 
     it "has enumbeable state" do
-      expect(result.status).to eq("deleted")
+      expect(result.status).to eq("destroyed")
     end
 
-    it "responds to .deleted?" do
-      expect(result).to be_deleted
+    it "responds to .destroyed?" do
+      expect(result).to be_destroyed
     end
   end
 
