@@ -5,17 +5,17 @@ require_relative "../field_level_strategies"
 module Anony
   module Strategies
     # The interface for configuring a field-level strategy. All of the methods here are
-    # made available inside the `fields { ... }` block:
+    # made available inside the `overwrite { ... }` block:
     #
     # @example
     #   anonymise do
-    #     fields do
+    #     overwrite do
     #       nilable :first_name
     #       email :email_address
     #       with_strategy(:last_name) { "last-#{id}" }
     #     end
     #   end
-    class Fields
+    class Overwrite
       include FieldLevelStrategies
 
       # @!visibility private
@@ -40,7 +40,7 @@ module Anony
         raise FieldException, unhandled_fields if unhandled_fields.any?
       end
 
-      # Apply the Fields strategy on the model instance, which applies each of the
+      # Apply the Overwrite strategy on the model instance, which applies each of the
       # configured transformations and updates the :anonymised_at field if it exists.
       #
       # @param [ActiveRecord::Base] instance An instance of the model

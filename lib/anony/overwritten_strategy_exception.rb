@@ -6,7 +6,7 @@ module Anony
   #
   # @example
   #   anonymise do
-  #     fields do
+  #     overwrite do
   #       ignore :first_name
   #       nilable :first_name
   #     end

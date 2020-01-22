@@ -3,7 +3,7 @@
 require "spec_helper"
 require_relative "../helpers/database"
 
-RSpec.describe Anony::Strategies::Fields do
+RSpec.describe Anony::Strategies::Overwrite do
   module StubAnoynmiser
     def self.call(*_)
       "OVERWRITTEN DATA"
@@ -87,7 +87,7 @@ RSpec.describe Anony::Strategies::Fields do
 
         self.table_name = :only_anonymised
         anonymise do
-          fields { ignore :id }
+          overwrite { ignore :id }
         end
       end
     end

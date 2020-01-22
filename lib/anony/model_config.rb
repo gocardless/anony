@@ -3,7 +3,7 @@
 require "active_support/core_ext/module/delegation"
 
 require_relative "./strategies/destroy"
-require_relative "./strategies/fields"
+require_relative "./strategies/overwrite"
 
 module Anony
   class ModelConfig
@@ -14,7 +14,7 @@ module Anony
       end
 
       def validate!
-        raise ArgumentError, "Must specify either :destroy or :fields strategy"
+        raise ArgumentError, "Must specify either :destroy or :overwrite strategy"
       end
     end
 
@@ -64,26 +64,26 @@ module Anony
       @strategy = Strategies::Destroy.new
     end
 
-    # Use the fields strategy to configure rules for individual fields. This method is
+    # Use the overwrite strategy to configure rules for individual fields. This method is
     # incompatible with the destroy strategy.
     #
     # This method takes a configuration block. All configuration is applied to
-    # Anony::Strategies::Fields.
+    # Anony::Strategies::Overwrite.
     #
-    # @see Anony::Strategies::Fields
+    # @see Anony::Strategies::Overwrite
     #
     # @example
     #   anonymise do
-    #     fields do
+    #     overwrite do
     #       hex :first_name
     #     end
     #   end
-    def fields(&block)
+    def overwrite(&block)
       unless @strategy.is_a?(UndefinedStrategy)
-        raise ArgumentError, "Cannot specify :fields when another strategy already defined"
+        raise ArgumentError, "Cannot specify :overwrite when another strategy already defined"
       end
 
-      @strategy = Strategies::Fields.new(@model_class, &block)
+      @strategy = Strategies::Overwrite.new(@model_class, &block)
     end
 
     # Prevent any anonymisation strategy being applied when the provided block evaluates

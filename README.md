@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
   include Anony::Anonymisable
 
   anonymise do
-    fields do
+    overwrite do
       hex :first_name
     end
   end
@@ -73,7 +73,7 @@ overwrites fields using `SecureRandom.hex` or sets them to `nil`:
 
 ```ruby
 anonymise do
-  fields do
+  overwrite do
     hex :field_name
     nilable :nullable_field
   end
@@ -134,7 +134,7 @@ class Employee < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    fields do
+    overwrite do
       reverse :first_name
     end
   end
@@ -165,7 +165,7 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    fields do
+    overwrite do
       with_strategy OverwriteUUID, :id
     end
   end
@@ -180,7 +180,7 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    fields do
+    overwrite do
       with_strategy 123, :id
     end
   end
@@ -207,7 +207,7 @@ class Manager < ApplicationRecord
   include Anony::Anonymisable
 
   anonymise do
-    fields do
+    overwrite do
       with_strategy(:first_name) { |name| Digest::SHA2.hexdigest(name) }
       with_strategy(:last_name) { "previous-name-of-#{id}" }
     end
