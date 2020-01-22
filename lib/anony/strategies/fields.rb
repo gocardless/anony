@@ -67,6 +67,8 @@ module Anony
       # @yieldparam previous [Object] The previous value of the field
       # @yieldreturn [Object] The value to set on that field.
       # @raise [ArgumentError] If the combination of strategy, fields and block is invalid.
+      # @raise [OverwrittenStrategyException] If the field strategies
+      #   defined will overwrite each other.
       #
       # @example With a named class
       #   class Reverse
