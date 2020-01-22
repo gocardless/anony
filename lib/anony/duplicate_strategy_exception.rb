@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 module Anony
-  # This exception is thrown if you try to overwrite the strategy for a field which is
-  # already defined.
+  # This exception is thrown if you define more than one strategy for the same field.
   #
   # @example
   #   anonymise do
@@ -11,10 +10,10 @@ module Anony
   #       nilable :first_name
   #     end
   #   end
-  class OverwrittenStrategyException < StandardError
+  class DuplicateStrategyException < StandardError
     def initialize(fields)
       fields = Array(fields)
-      super("Overwritten anonymisation strategy for field(s) #{fields}")
+      super("Duplicate anonymisation strategy for field(s) #{fields}")
     end
   end
 end

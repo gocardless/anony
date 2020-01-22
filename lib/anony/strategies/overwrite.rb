@@ -67,8 +67,7 @@ module Anony
       # @yieldparam previous [Object] The previous value of the field
       # @yieldreturn [Object] The value to set on that field.
       # @raise [ArgumentError] If the combination of strategy, fields and block is invalid.
-      # @raise [OverwrittenStrategyException] If the field strategies
-      #   defined will overwrite each other.
+      # @raise [DuplicateStrategyException] If more than one strategy is defined for the same field.
       #
       # @example With a named class
       #   class Reverse
@@ -95,7 +94,7 @@ module Anony
         raise ArgumentError, "Block or Strategy object required" unless strategy
         raise ArgumentError, "One or more fields required" unless fields.any?
 
-        guard_overwritten_strategies!(fields)
+        guard_duplicate_strategies!(fields)
 
         fields.each { |field| @anonymisable_fields[field] = strategy }
       end
@@ -159,11 +158,11 @@ module Anony
         end
       end
 
-      private def guard_overwritten_strategies!(fields)
+      private def guard_duplicate_strategies!(fields)
         defined_fields = @anonymisable_fields.keys
-        overwritten_fields = defined_fields & fields
+        duplicate_fields = defined_fields & fields
 
-        raise OverwrittenStrategyException, overwritten_fields if overwritten_fields.any?
+        raise DuplicateStrategyException, duplicate_fields if duplicate_fields.any?
       end
     end
   end

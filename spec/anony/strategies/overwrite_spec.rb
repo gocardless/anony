@@ -37,9 +37,9 @@ RSpec.describe Anony::Strategies::Overwrite do
         config.with_strategy(StubAnoynmiser, :field)
       end
 
-      it "throws an overwritten_strategy_exception" do
+      it "throws an duplicate_strategy_exception" do
         expect { config.no_op(:field) }.
-          to raise_error(Anony::OverwrittenStrategyException)
+          to raise_error(Anony::DuplicateStrategyException)
       end
     end
 
