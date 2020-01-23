@@ -127,21 +127,21 @@ module Anony
     #
     # @example Direct usage:
     #   anonymise do
-    #     fields do
+    #     overwrite do
     #       with_strategy(OverwriteHex.new(20), :field, :field)
     #     end
     #   end
     #
     # @example Helper method, assumes length = 36
     #   anonymise do
-    #     fields do
+    #     overwrite do
     #       hex :field
     #     end
     #   end
     #
     # @example Helper method with explicit length
     #   anonymise do
-    #     fields do
+    #     overwrite do
     #       hex :field, max_length: 20
     #     end
     #   end

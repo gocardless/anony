@@ -3,7 +3,7 @@
 module Anony
   module Strategies
     # The interface for configuring a destroy strategy. This strategy is not compatible
-    # with Anony::Strategies::Fields.
+    # with Anony::Strategies::Overwrite.
     #
     # @example
     #   anonymise do

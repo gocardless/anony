@@ -5,17 +5,17 @@ require_relative "../field_level_strategies"
 module Anony
   module Strategies
     # The interface for configuring a field-level strategy. All of the methods here are
-    # made available inside the `fields { ... }` block:
+    # made available inside the `overwrite { ... }` block:
     #
     # @example
     #   anonymise do
-    #     fields do
+    #     overwrite do
     #       nilable :first_name
     #       email :email_address
     #       with_strategy(:last_name) { "last-#{id}" }
     #     end
     #   end
-    class Fields
+    class Overwrite
       include FieldLevelStrategies
 
       # @!visibility private
@@ -40,7 +40,7 @@ module Anony
         raise FieldException, unhandled_fields if unhandled_fields.any?
       end
 
-      # Apply the Fields strategy on the model instance, which applies each of the
+      # Apply the Overwrite strategy on the model instance, which applies each of the
       # configured transformations and updates the :anonymised_at field if it exists.
       #
       # @param [ActiveRecord::Base] instance An instance of the model
@@ -67,8 +67,7 @@ module Anony
       # @yieldparam previous [Object] The previous value of the field
       # @yieldreturn [Object] The value to set on that field.
       # @raise [ArgumentError] If the combination of strategy, fields and block is invalid.
-      # @raise [OverwrittenStrategyException] If the field strategies
-      #   defined will overwrite each other.
+      # @raise [DuplicateStrategyException] If more than one strategy is defined for the same field.
       #
       # @example With a named class
       #   class Reverse
@@ -95,7 +94,7 @@ module Anony
         raise ArgumentError, "Block or Strategy object required" unless strategy
         raise ArgumentError, "One or more fields required" unless fields.any?
 
-        guard_overwritten_strategies!(fields)
+        guard_duplicate_strategies!(fields)
 
         fields.each { |field| @anonymisable_fields[field] = strategy }
       end
@@ -159,11 +158,11 @@ module Anony
         end
       end
 
-      private def guard_overwritten_strategies!(fields)
+      private def guard_duplicate_strategies!(fields)
         defined_fields = @anonymisable_fields.keys
-        overwritten_fields = defined_fields & fields
+        duplicate_fields = defined_fields & fields
 
-        raise OverwrittenStrategyException, overwritten_fields if overwritten_fields.any?
+        raise DuplicateStrategyException, duplicate_fields if duplicate_fields.any?
       end
     end
   end

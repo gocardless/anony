@@ -17,7 +17,7 @@ RSpec.describe Anony::FieldLevelStrategies do
 
       it "registers the strategy" do
         register
-        expect(Anony::Strategies::Fields.instance_methods).to include(:reverse)
+        expect(Anony::Strategies::Overwrite.instance_methods).to include(:reverse)
       end
     end
 
@@ -26,7 +26,7 @@ RSpec.describe Anony::FieldLevelStrategies do
 
       it "registers the strategy" do
         register
-        expect(Anony::Strategies::Fields.instance_methods).to include(:reverse)
+        expect(Anony::Strategies::Overwrite.instance_methods).to include(:reverse)
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe Anony::FieldLevelStrategies do
 
       it "registers the strategy" do
         register
-        expect(Anony::Strategies::Fields.instance_methods).to include(:reverse)
+        expect(Anony::Strategies::Overwrite.instance_methods).to include(:reverse)
       end
     end
 

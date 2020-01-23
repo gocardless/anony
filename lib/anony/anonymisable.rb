@@ -2,7 +2,7 @@
 
 require "active_support/core_ext/module/delegation"
 
-require_relative "./strategies/fields"
+require_relative "./strategies/overwrite"
 require_relative "model_config"
 
 module Anony
@@ -29,11 +29,11 @@ module Anony
       # Define a set of anonymisation configuration on the ActiveRecord class.
       #
       # @yield A configuration block
-      # @see DSL Anony::Strategies::Fields - the methods available inside this block
+      # @see DSL Anony::Strategies::Overwrite - the methods available inside this block
       # @example
       #   class Manager < ApplicationRecord
       #     anonymise do
-      #       fields do
+      #       overwrite do
       #         with_strategy(:first_name) { "ANONYMISED" }
       #       end
       #     end

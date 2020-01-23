@@ -16,7 +16,7 @@ RSpec.context "ActiveRecord integration" do
       self.table_name = :employees
 
       anonymise do
-        fields do
+        overwrite do
           ignore :id
           hex :first_name
           nilable :last_name

@@ -18,7 +18,7 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :employees
 
         anonymise do
-          fields do
+          overwrite do
             ignore :id
             with_strategy StubAnoynmiser, :company_name
             with_strategy(:first_name) { |v, _| v.reverse }
@@ -153,7 +153,7 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :employees
 
         anonymise do
-          fields do
+          overwrite do
             with_strategy StubAnoynmiser, :first_name
           end
         end
@@ -204,11 +204,11 @@ RSpec.describe Anony::Anonymisable do
       end
 
       expect { klass.anonymise_config.validate! }.
-        to raise_error(ArgumentError, "Must specify either :destroy or :fields strategy")
+        to raise_error(ArgumentError, "Must specify either :destroy or :overwrite strategy")
     end
   end
 
-  context "when trying to define :fields after :destroy" do
+  context "when trying to define :overwrite after :destroy" do
     it "throws an exception" do
       expect do
         Class.new(ActiveRecord::Base) do
@@ -216,23 +216,23 @@ RSpec.describe Anony::Anonymisable do
 
           anonymise do
             destroy
-            fields { nilable :a_field }
+            overwrite { nilable :a_field }
           end
         end
       end.to raise_error(
-        ArgumentError, "Cannot specify :fields when another strategy already defined"
+        ArgumentError, "Cannot specify :overwrite when another strategy already defined"
       )
     end
   end
 
-  context "when trying to define :fields before :destroy" do
+  context "when trying to define :overwrite before :destroy" do
     it "throws an exception" do
       expect do
         Class.new(ActiveRecord::Base) do
           include Anony::Anonymisable
 
           anonymise do
-            fields do
+            overwrite do
               nilable :first_name
             end
             destroy
@@ -252,7 +252,7 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :employees
 
         anonymise do
-          fields do
+          overwrite do
             ignore :id
             hex :first_name
             nilable :last_name
@@ -293,7 +293,7 @@ RSpec.describe Anony::Anonymisable do
         include Anony::Anonymisable
       end
 
-      expect { klass.anonymise { fields { ignore :id } } }.to raise_error(
+      expect { klass.anonymise { overwrite { ignore :id } } }.to raise_error(
         ArgumentError, "Cannot ignore [:id] (fields already ignored in Anony::Config)"
       )
     end
@@ -304,7 +304,7 @@ RSpec.describe Anony::Anonymisable do
 
         self.table_name = :only_ids
 
-        anonymise { fields {} }
+        anonymise { overwrite {} }
       end
 
       expect(klass).to be_valid_anonymisation
@@ -319,7 +319,7 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :a_fields
 
         anonymise do
-          fields do
+          overwrite do
             with_strategy StubAnoynmiser, :a_field
           end
         end
@@ -333,7 +333,7 @@ RSpec.describe Anony::Anonymisable do
         self.table_name = :a_fields
 
         anonymise do
-          fields do
+          overwrite do
             with_strategy("foo", :a_field)
           end
         end
