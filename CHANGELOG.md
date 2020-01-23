@@ -1,3 +1,8 @@
+# v0.8.0
+
+* Improve the documentation [#45](https://github.com/gocardless/anony/pull/45)
+* Rename fields strategy to overwrite [#46](https://github.com/gocardless/anony/pull/46)
+
 # v0.7.3
 
 * Allow customising the model superclass for the `DefineDeletionStrategy` cop [#36](https://github.com/gocardless/anony/pull/36)
