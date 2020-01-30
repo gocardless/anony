@@ -32,6 +32,10 @@ RSpec.describe Anony::Result do
     it "responds to .destroyed?" do
       expect(result).to be_destroyed
     end
+
+    it "has no fields" do
+      expect(result.fields).to be_empty
+    end
   end
 
   context "skipped" do
@@ -43,6 +47,10 @@ RSpec.describe Anony::Result do
 
     it "responds to .skipped?" do
       expect(result).to be_skipped
+    end
+
+    it "has no fields" do
+      expect(result.fields).to be_empty
     end
   end
 

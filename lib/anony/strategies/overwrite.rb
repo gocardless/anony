@@ -50,11 +50,11 @@ module Anony
           current_datetime(:anonymised_at)
         end
 
-        result_fields = {}
-
         @anonymisable_fields.each_key do |field|
-          result_fields[field.to_sym] = anonymise_field(instance, field)
+          anonymise_field(instance, field)
         end
+
+        result_fields = instance.changes.keys.map(&:to_sym).reject { |s| s == :anonymised_at }
 
         instance.save!
 

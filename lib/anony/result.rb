@@ -9,7 +9,8 @@ module Anony
     OVERWRITTEN = "overwritten"
     SKIPPED = "skipped"
 
-    attr_reader :fields, :error
+    attr_reader :status, :fields, :error
+    delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
 
     def self.failed(error)
       new(FAILED, error: error)
@@ -27,11 +28,7 @@ module Anony
       new(DESTROYED)
     end
 
-    attr_reader :status
-
-    delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
-
-    private def initialize(status, fields: {}, error: nil)
+    private def initialize(status, fields: [], error: nil)
       raise ArgumentError, "No error provided" if status == FAILED && error.nil?
 
       @status = ActiveSupport::StringInquirer.new(status)
