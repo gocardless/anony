@@ -54,7 +54,11 @@ module Anony
           anonymise_field(instance, field)
         end
 
+        result_fields = instance.changes.keys.map(&:to_sym).reject { |s| s == :anonymised_at }
+
         instance.save!
+
+        Result.overwritten(result_fields)
       end
 
       # Configure a custom strategy for one or more fields. If a block is given that is used

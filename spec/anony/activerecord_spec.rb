@@ -43,6 +43,14 @@ RSpec.context "ActiveRecord integration" do
   end
   # rubocop:enable RSpec/ExampleLength
 
+  it "populates the result fields hash with only anonymised fields" do
+    result = instance.anonymise!
+    expect(result.fields).to match_array(%i[
+      first_name last_name email_address
+      phone_number company_name onboarded_at
+    ])
+  end
+
   it "sets the anonymised_at column" do
     expect { instance.anonymise! }.
       to change(instance, :anonymised_at).from(nil).to be_within(1).of(Time.now)

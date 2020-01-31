@@ -59,12 +59,7 @@ module Anony
 
     # Run all anonymisation strategies on the model instance before saving it.
     #
-    # @return [true] if the save was successful
-    # @raise [FieldException] if the configuration is invalid (configuration is lazily validated)
-    # @raise [SkippedException] if the skip_if condition matched
-    # @raise [ActiveRecord::RecordNotSaved] if the save failed (e.g. a validation error)
-    # @raise [ActiveRecord::RecordNotDestroyed] if the destroy failed (where this strategy
-    #   has been configured)
+    # @return [Anony::Result] described if the save was successful, and the fields or errors created
     # @example
     #   manager = Manager.first
     #   manager.anonymise!
@@ -73,6 +68,8 @@ module Anony
 
       self.class.anonymise_config.validate!
       self.class.anonymise_config.apply(self)
+    rescue FieldException, ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
+      Result.failed(e)
     end
 
     # @!visibility private

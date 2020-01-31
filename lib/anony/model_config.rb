@@ -39,7 +39,7 @@ module Anony
     # @example
     #   Anony::ModelConfig.new(Manager).apply(Manager.new)
     def apply(instance)
-      raise Anony::SkippedException if @skip_filter && instance.instance_exec(&@skip_filter)
+      return Result.skipped if @skip_filter && instance.instance_exec(&@skip_filter)
 
       @strategy.apply(instance)
     end

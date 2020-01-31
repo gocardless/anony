@@ -1,3 +1,7 @@
+# v1.0.0
+
+* Create a result object when calling `anonymise!` [#44](https://github.com/gocardless/anony/pull/44)
+
 # v0.8.0
 
 * Improve the documentation [#45](https://github.com/gocardless/anony/pull/45)

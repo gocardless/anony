@@ -19,7 +19,7 @@ irb(main):001:0> user = User.find(1)
 => #<User id="1" first_name="Alice">
 
 irb(main):002:0> user.anonymise!
- => #<User id="1" first_name="874cb84f6d9129f33a40ad5298448305">
+ => #<Anony::Result status="overwritten" fields=[:first_name] error=nil>
 ```
 
 ## Installation & configuration
@@ -99,15 +99,27 @@ irb(main):001:0> model = Model.find(1)
 => #<Model id="1" field_name="Previous value" nullable_field="Previous">
 
 irb(main):002:0> model.anonymise!
- => #<Model id="1" field_name="5f875d4aaf43b1fd57f1ec88ff215ba7" nullable_field=nil>
- ```
+ => #<Anony::Result status="overwritten" fields=[:field_name, :nullable_field] error=nil>
+```
 
  Or, if you were using the `destroy` strategy:
 
- ```ruby
- irb(main):002:0> model.anonymise!
- => true
- ```
+```ruby
+irb(main):002:0> model.anonymise!
+=> #<Anony::Result status="destroyed" fields=nil error=nil>
+```
+
+### Result object
+
+When a model is anonymised, an Anony::Result is returned. This allows the library to detail the changes is made and the strategy it used.
+
+The result object has 3 attributes:
+
+  * `status` - If the model was `destroyed`, `overwritten`, `skipped` or the operation `failed`
+  * `fields` - In the event the model was `overwritten`, the fields that were updated (excludes timestamps)
+  * `error` - In the event the anonymisation `failed`, then the associated error. Note only rescues the following errors: `Anony::FieldException`, `ActiveRecord::RecordNotSaved`, `ActiveRecord::RecordNotDestroyed`. Anything else is thrown.
+
+For convenience, the result object can also be queried with `destroyed?`, `overwritten?`, `skipped?` and `failed?`, so that it can be directly interrogated or used in a `switch case` with the `status` property.
 
 ### Field strategies
 
