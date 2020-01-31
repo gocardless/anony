@@ -29,6 +29,10 @@ references:
     - run: bundle exec rubocop --parallel --extra-details --display-style-guide
 
 jobs:
+  ruby24:
+    docker:
+      - image: ruby:2.4
+    steps: *steps
   ruby25:
     docker:
       - image: ruby:2.5
@@ -42,5 +46,6 @@ workflows:
   version: 2
   tests:
     jobs:
+      - ruby24
       - ruby25
       - ruby26
