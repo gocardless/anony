@@ -278,10 +278,12 @@ RSpec.describe Anony::Anonymisable do
 
   context "with ignored fields in Anony::Config" do
     around do |example|
-      original_ignores = Anony::Config.ignores
-      example.call
-    ensure
-      Anony::Config.ignores = original_ignores
+      begin
+        original_ignores = Anony::Config.ignores
+        example.call
+      ensure
+        Anony::Config.ignores = original_ignores
+      end
     end
 
     before { Anony::Config.ignore_fields(:id) }

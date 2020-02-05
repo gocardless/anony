@@ -7,8 +7,9 @@ references:
     - type: cache-restore
       key: anony-bundler-{{ checksum "anony.gemspec" }}
 
-    - run: gem install bundler -v 2.0.2
-    - run: bundle install --path vendor/bundle
+    - run: gem install bundler -v 2.1.4
+    - run: bundle config set path 'vendor/bundle'
+    - run: bundle install
 
     - type: cache-save
       key: anony-bundler-{{ checksum "anony.gemspec" }}
@@ -29,6 +30,10 @@ references:
     - run: bundle exec rubocop --parallel --extra-details --display-style-guide
 
 jobs:
+  ruby24:
+    docker:
+      - image: ruby:2.4
+    steps: *steps
   ruby25:
     docker:
       - image: ruby:2.5
@@ -37,10 +42,16 @@ jobs:
     docker:
       - image: ruby:2.6
     steps: *steps
+  ruby27:
+    docker:
+      - image: ruby:2.7
+    steps: *steps
 
 workflows:
   version: 2
   tests:
     jobs:
+      - ruby24
       - ruby25
       - ruby26
+      - ruby27

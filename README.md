@@ -22,6 +22,8 @@ irb(main):002:0> user.anonymise!
  => #<Anony::Result status="overwritten" fields=[:first_name] error=nil>
 ```
 
+For our policy on compatibility with Ruby versions, see [COMPATIBILITY.md](docs/COMPATIBILITY.md).
+
 ## Installation & configuration
 
 This library is distributed as a Ruby gem, and we recommend adding it your Gemfile:
