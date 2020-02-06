@@ -68,7 +68,7 @@ class Employee < ActiveRecord::Base
 end
 ```
 
-If you want to overwrite certain fields on the model, you should use the `fields`
+If you want to overwrite certain fields on the model, you should use the `overwrite`
 DSL. There are many different ways (known as "strategies") to overwrite your fields (see
 [Field strategies](#field-strategies) below). For now, let's use the `hex` & `nilable` strategies, which
 overwrites fields using `SecureRandom.hex` or sets them to `nil`:
@@ -92,7 +92,7 @@ anonymise do
 end
 ```
 
-Please note that both the `fields` and `destroy` strategies cannot be used simultaneously.
+Please note that both the `overwrite` and `destroy` strategies cannot be used simultaneously.
 
 Now, given a model instance, we can use the `#anonymise!` method to apply our strategies:
 
@@ -113,7 +113,7 @@ irb(main):002:0> model.anonymise!
 
 ### Result object
 
-When a model is anonymised, an Anony::Result is returned. This allows the library to detail the changes is made and the strategy it used.
+When a model is anonymised, an `Anony::Result` is returned. This allows the library to detail the changes is made and the strategy it used. The result object also contains the errors that may have been raised within Anony, allowing you to handle them elegantly without using the exceptions for flow control.
 
 The result object has 3 attributes:
 
@@ -206,7 +206,7 @@ irb(main):001:0> manager = Manager.first
  => #<Manager id=42>
 
 irb(main):002:0> manager.anonymise!
- => true
+ => #<Anony::Result status="overwritten" fields=[:id] error=nil>
 
 irb(main):003:0> manager
  => #<Manager id=123>
@@ -234,10 +234,10 @@ irb(main):001:0> manager = Manager.first
  => #<Manager id=42>
 
 irb(main):002:0> manager.anonymise!
- => true
+=> #<Anony::Result status="overwritten" fields=[:first_name, :last_name] error=nil>
 
 irb(main):003:0> manager
- => #<Manager id="e9ab2800-d4b9-4227-94a7-7f81118d8a8a">
+ => #<Manager first_name="e9ab2800-d4b9-4227-94a7-7f81118d8a8a" last_name="previous-name-of-42">
 ```
 
 ### Identifying anonymised records
@@ -284,7 +284,7 @@ You might have a need to preserve model data in some (or all) circumstances. Ano
 the `skip_if` DSL for expressing this preference, which runs the given block before
 attempting any strategy.
 
-* If the block returns _truthy_, anonymisation is skipped and `Anony::SkippedException` is thrown.
+* If the block returns _truthy_, anonymisation is skipped.
 * If the block returns _falsey_, anonymisation continues.
 
 ```ruby
@@ -299,12 +299,14 @@ class Manager
 end
 ```
 
+The result object will indicate the model was skipped:
+
 ```
 irb(main):001:0> manager = Manager.find(1)
  => #<Manager id=1>
 
 irb(main):002:0> manager.anonymise!
- => Anony::SkippedException("Anonymisation skipped due to matching skip_if filter")
+=> #<Anony::Result status="skipped" fields=[] error=nil>
 ```
 
 ## Incomplete field strategies
@@ -315,15 +317,24 @@ columns are added/removed or the contents of those columns changes.
 
 As such, Anony will validate your model configuration when you try to anonymise the
 model (unfortunately this cannot be safely done at boot as the database might not be
-available). If your configuration is incomplete, calling `#anonymise!` will raise a
-`FieldsException` and warn which fields are missing.
+available). If your configuration is incomplete, calling `#anonymise!` will fail, and a
+`FieldsException` will be returned in the `error` attribute of the `Anony:Result` object.
+This exception will warn which fields are missing.
+
+```
+irb(main):001:0> manager = Manager.find(1)
+ => #<Manager id=1>
+
+irb(main):002:0> manager.anonymise!
+=> #<Anony::Result status="failed", fields=[], error=#<Anony::FieldException: Invalid anonymisation strategy for field(s) [:email]>>
+```
 
 We recommend adding a test for each model that you anonymise (see [Testing](#testing)
 below).
 
 ### Adding new columns
 
-Anony will throw an exception if you try to anonymise a model without specifying a
+Anony will fail if you try to anonymise a model without specifying a
 strategy for all of the columns (to ensure that anonymisation rules aren't missed over
 time). However, it's fine to define a strategy for a column
 that hasn't yet been added.
@@ -369,9 +380,12 @@ RSpec.describe Employee do
   subject { FactoryBot.build(:employee) }
 
   # If you just anonymise fields normally
-  it_behaves_like "anonymisable model"
+  it_behaves_like "overwritten anonymisable model"
 
-  # OR, if you anonymise by destroying the record
+  # Or, if your anonymised model should be skipped
+  it_behaves_like "skipped anonymisable model"
+
+  # Or, if you anonymise by destroying the record
   it_behaves_like "anonymisable model with destruction"
 end
 ```
