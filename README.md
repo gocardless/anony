@@ -22,7 +22,7 @@ irb(main):002:0> user.anonymise!
  => #<Anony::Result status="overwritten" fields=[:first_name] error=nil>
 ```
 
-For our policy on compatibility with Ruby versions, see [COMPATIBILITY.md](docs/COMPATIBILITY.md).
+For our policy on compatibility with Ruby and Rails versions, see [COMPATIBILITY.md](docs/COMPATIBILITY.md).
 
 ## Installation & configuration
 
