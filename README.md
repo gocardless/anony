@@ -386,7 +386,7 @@ RSpec.describe Employee do
   it_behaves_like "skipped anonymisable model"
 
   # Or, if you anonymise by destroying the record
-  it_behaves_like "anonymisable model with destruction"
+  it_behaves_like "destroyed anonymisable model"
 end
 ```
 
