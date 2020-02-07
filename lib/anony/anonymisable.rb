@@ -68,7 +68,7 @@ module Anony
 
       self.class.anonymise_config.validate!
       self.class.anonymise_config.apply(self)
-    rescue FieldException, ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
+    rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
       Result.failed(e)
     end
 

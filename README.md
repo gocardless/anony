@@ -119,7 +119,7 @@ The result object has 3 attributes:
 
   * `status` - If the model was `destroyed`, `overwritten`, `skipped` or the operation `failed`
   * `fields` - In the event the model was `overwritten`, the fields that were updated (excludes timestamps)
-  * `error` - In the event the anonymisation `failed`, then the associated error. Note only rescues the following errors: `Anony::FieldException`, `ActiveRecord::RecordNotSaved`, `ActiveRecord::RecordNotDestroyed`. Anything else is thrown.
+  * `error` - In the event the anonymisation `failed`, then the associated error. Note only rescues the following errors: `ActiveRecord::RecordNotSaved`, `ActiveRecord::RecordNotDestroyed`. Anything else is thrown.
 
 For convenience, the result object can also be queried with `destroyed?`, `overwritten?`, `skipped?` and `failed?`, so that it can be directly interrogated or used in a `switch case` with the `status` property.
 
@@ -317,16 +317,16 @@ columns are added/removed or the contents of those columns changes.
 
 As such, Anony will validate your model configuration when you try to anonymise the
 model (unfortunately this cannot be safely done at boot as the database might not be
-available). If your configuration is incomplete, calling `#anonymise!` will fail, and a
-`FieldsException` will be returned in the `error` attribute of the `Anony:Result` object.
-This exception will warn which fields are missing.
+available). If your configuration is incomplete, calling `#anonymise!` will raise a
+`FieldsException` and will not return an `Anony:Result` object. This is perceived
+to a critical error as anony cannot safely anonymise the model.
 
 ```
 irb(main):001:0> manager = Manager.find(1)
  => #<Manager id=1>
 
 irb(main):002:0> manager.anonymise!
-=> #<Anony::Result status="failed", fields=[], error=#<Anony::FieldException: Invalid anonymisation strategy for field(s) [:email]>>
+Anony::FieldException (Invalid anonymisation strategy for field(s) [:username])
 ```
 
 We recommend adding a test for each model that you anonymise (see [Testing](#testing)
