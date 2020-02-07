@@ -171,8 +171,7 @@ RSpec.describe Anony::Anonymisable do
       let(:model) { klass.new }
 
       it "throws an exception" do
-        result = model.anonymise!
-        expect(result.error).to be_an_instance_of(Anony::FieldException)
+        expect { model.anonymise! }.to raise_error(Anony::FieldException)
       end
     end
   end
