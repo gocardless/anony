@@ -29,7 +29,7 @@ RSpec.context "ActiveRecord integration" do
     end
   end
 
-  it_behaves_like "anonymisable model"
+  it_behaves_like "overwritten anonymisable model"
 
   # rubocop:disable RSpec/ExampleLength
   it "applies the correct changes to each column" do

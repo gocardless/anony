@@ -2,18 +2,34 @@
 
 require "rspec"
 
-RSpec.shared_examples "anonymisable model" do
+RSpec.shared_examples "overwritten anonymisable model" do
   it "has a valid strategy defined" do
     expect(subject.class).to be_valid_anonymisation
   end
 
-  it "successfully calls #anonymise!" do
+  it "#anonymise! causes overwrite" do
     result = subject.anonymise!
-    expect(result).not_to be_failed
+    expect(result).to be_overwritten
   end
 end
 
-RSpec.shared_examples "anonymisable model with destruction" do
+RSpec.shared_examples "skipped anonymisable model" do
+  it "has a valid strategy defined" do
+    expect(subject.class).to be_valid_anonymisation
+  end
+
+  it "#anonymise! is skipped" do
+    result = subject.anonymise!
+    expect(result).to be_skipped
+  end
+
+  it "does not change any fields" do
+    result = subject.anonymise!
+    expect(result.fields).to be_empty
+  end
+end
+
+RSpec.shared_examples "destroyed anonymisable model" do
   it "has a valid strategy defined" do
     expect(subject.class).to be_valid_anonymisation
   end

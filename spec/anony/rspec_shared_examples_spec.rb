@@ -21,7 +21,7 @@ RSpec.describe "RSpec shared examples" do
     klass.new
   end
 
-  it_behaves_like "anonymisable model"
+  it_behaves_like "overwritten anonymisable model"
 
   context "with destruction" do
     let(:described_class) do
@@ -34,8 +34,29 @@ RSpec.describe "RSpec shared examples" do
       end
     end
 
-    it_behaves_like "anonymisable model with destruction" do
+    it_behaves_like "destroyed anonymisable model" do
       subject! { described_class.create!(first_name: "foo", company_name: "bar") }
+    end
+  end
+
+  context "with skipping" do
+    let(:described_class) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :a_fields
+
+        anonymise do
+          skip_if { true }
+          overwrite do
+            hex :a_field
+          end
+        end
+      end
+    end
+
+    it_behaves_like "skipped anonymisable model" do
+      subject! { described_class.create!(a_field: "foo") }
     end
   end
 end
