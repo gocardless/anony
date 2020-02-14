@@ -1,5 +1,8 @@
 # Anony
 
+[![Yard Documentation](http://img.shields.io/badge/yard-docs-blue.svg)](http://rubydoc.info/gems/anony)
+[![Build status](https://circleci.com/gh/gocardless/anony.svg?style=svg)](https://circleci.com/gh/gocardless/anony)
+
 Anony is a small library that defines how ActiveRecord models should be anonymised for
 deletion purposes.
 
