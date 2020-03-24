@@ -64,7 +64,9 @@ module Anony
     #   manager = Manager.first
     #   manager.anonymise!
     def anonymise!
-      raise ArgumentError, ".anonymise not yet invoked" unless self.class.anonymise_config
+      unless self.class.anonymise_config
+        raise ArgumentError, "#{self.class.name} does not have an Anony configuration"
+      end
 
       self.class.anonymise_config.validate!
       self.class.anonymise_config.apply(self)
