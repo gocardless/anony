@@ -1,3 +1,7 @@
+# v1.0.1
+
+* Throw a more useful exception when calling .anonymise without config [#53](https://github.com/gocardless/anony/pull/53)
+
 # v1.0.0
 
 * Create a result object when calling `anonymise!` [#44](https://github.com/gocardless/anony/pull/44)
