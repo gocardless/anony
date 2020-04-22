@@ -1,86 +1,54 @@
 version: 2.1
 
-references:
-  steps: &steps
-    - checkout
-
-    - restore_cache:
-        key: anony-bundler-{{ checksum "anony.gemspec" }}
-
-    - run: gem install bundler -v 2.1.4
-    - run: bundle config set path 'vendor/bundle'
-    - run: bundle install
-
-    - save_cache:
-        key: anony-bundler-{{ checksum "anony.gemspec" }}
-        paths:
-          - vendor/bundle
-
-    - run:
-        command: |
-          bundle exec rspec --profile 10 \
-                            --format RspecJunitFormatter \
-                            --out /tmp/test-results/rspec.xml \
-                            --format progress \
-                            spec
-
-    - store_test_results:
-        path: /tmp/test-results
-
-    - run: bundle exec rubocop --parallel --extra-details --display-style-guide
-
 jobs:
-  ruby24-rails52:
+  test:
+    parameters:
+      ruby-version:
+        type: string
+      rails-version:
+        type: string
+
     docker:
-      - image: ruby:2.4
+      - image: ruby:<<parameters.ruby-version>>
         environment:
-          - RAILS_VERSION=5.2
-    steps: *steps
-  ruby25-rails52:
-    docker:
-      - image: ruby:2.5
-        environment:
-          - RAILS_VERSION=5.2
-    steps: *steps
-  ruby25-rails60:
-    docker:
-      - image: ruby:2.5
-        environment:
-          - RAILS_VERSION=6.0
-    steps: *steps
-  ruby26-rails52:
-    docker:
-      - image: ruby:2.6
-        environment:
-          - RAILS_VERSION=5.2
-    steps: *steps
-  ruby26-rails60:
-    docker:
-      - image: ruby:2.6
-        environment:
-          - RAILS_VERSION=6.0
-    steps: *steps
-  ruby27-rails52:
-    docker:
-      - image: ruby:2.7
-        environment:
-          - RAILS_VERSION=5.2
-    steps: *steps
-  ruby27-rails60:
-    docker:
-      - image: ruby:2.7
-        environment:
-          - RAILS_VERSION=6.0
-    steps: *steps
+          - RAILS_VERSION=<<parameters.rails-version>>
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: anony-bundler-{{ checksum "anony.gemspec" }}
+
+      - run: gem install bundler -v 2.1.4
+      - run: bundle config set path 'vendor/bundle'
+      - run: bundle install
+
+      - save_cache:
+          key: anony-bundler-{{ checksum "anony.gemspec" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          command: |
+            bundle exec rspec --profile 10 \
+                              --format RspecJunitFormatter \
+                              --out /tmp/test-results/rspec.xml \
+                              --format progress \
+                              spec
+
+      - store_test_results:
+          path: /tmp/test-results
+
+      - run: bundle exec rubocop --parallel --extra-details --display-style-guide
 
 workflows:
   version: 2
   tests:
     jobs:
-      - ruby24-rails52
-      - ruby25-rails52
-      - ruby25-rails60
-      - ruby26-rails52
-      - ruby26-rails60
-      - ruby27-rails52
-      - ruby27-rails60
+      - test:
+          matrix:
+            parameters:
+              ruby-version: ["2.4", "2.5", "2.6", "2.7"]
+              rails-version: ["5.2", "6.0"]
+            exclude:
+              - ruby-version: "2.4"
+                rails-version: "6.0"
