@@ -40,9 +40,44 @@ jobs:
 
       - run: bundle exec rubocop --parallel --extra-details --display-style-guide
 
+  publish:
+    parameters:
+      ruby-version:
+        type: string
+
+    docker:
+      - image: ruby:<<parameters.ruby-version>>
+
+    steps:
+      - checkout
+      - run:
+          name: Check gem version
+          command: |
+            ANONY_VERSION=$(ruby -r ./lib/anony/version.rb -e "puts Anony::VERSION")
+            GIT_TAG=$(git describe --tags)
+            [ "${GIT_TAG}" == v"${ANONY_VERSION}" ] && exit 0
+            echo "Failed version check (git:${GIT_TAG} gem:${ANONY_VERSION})"
+            exit 1
+      - run:
+          name: Create credentials file
+          command: |
+            mkdir -p $HOME/.gem
+            touch $HOME/.gem/credentials
+            chmod 0600 $HOME/.gem/credentials
+      - run:
+          name: Setup credentials
+          command: |
+            printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+      - run:
+          name: Gem build
+          command: gem build anony.gemspec -o anony-release.gem
+      - run:
+          name: Gem publish
+          command: gem push anony-release.gem
+
 workflows:
   version: 2
-  tests:
+  test-and-publish:
     jobs:
       - test:
           matrix:
@@ -52,3 +87,12 @@ workflows:
             exclude:
               - ruby-version: "2.4"
                 rails-version: "6.0"
+      - publish:
+          ruby-version: "2.7"
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
