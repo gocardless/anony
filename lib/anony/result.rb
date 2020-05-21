@@ -10,6 +10,7 @@ module Anony
     SKIPPED = "skipped"
 
     attr_reader :status, :fields, :error
+
     delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
 
     def self.failed(error)
