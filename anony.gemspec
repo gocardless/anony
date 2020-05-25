@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.4"
 
   spec.add_development_dependency "bundler", "~> 2.1.4"
-  spec.add_development_dependency "gc_ruboconfig", "~> 2.13.0"
+  spec.add_development_dependency "gc_ruboconfig", "~> 2.14.0"
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "rspec_junit_formatter", "~> 0.4"
   spec.add_development_dependency "yard", "~> 0.9.20"
