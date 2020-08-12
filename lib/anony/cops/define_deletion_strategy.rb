@@ -2,7 +2,7 @@
 
 require "rubocop"
 
-require_relative "../version.rb"
+require_relative "../version"
 
 module RuboCop
   module Cop
