@@ -56,6 +56,8 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
   end
 
   context "when a model does not define anonymisation rules" do
+    subject(:offenses) { cop.offenses }
+
     shared_examples_for "an offense" do
       it { expect(offenses.count).to eq(1) }
 
@@ -69,8 +71,6 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
                 "blob/#{Anony::VERSION}/README.md for details")
       end
     end
-
-    subject(:offenses) { cop.offenses }
 
     let(:source) do
       <<~RUBY
