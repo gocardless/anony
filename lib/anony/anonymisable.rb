@@ -70,6 +70,8 @@ module Anony
 
       self.class.anonymise_config.validate!
       self.class.anonymise_config.apply(self)
+    rescue ActiveRecord::RecordInvalid => e
+      raise Anony::RecordInvalid, "#{self.class.name} - raised #{e.class.name} #{e.message}"
     rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
       Result.failed(e)
     end
