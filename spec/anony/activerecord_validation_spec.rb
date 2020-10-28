@@ -41,6 +41,7 @@ RSpec.context "ActiveRecord integration" do
       end
     end
 
+    # rubocop:disable RSpec/ExampleLength
     it "raises a specific error" do
       expect { instance.anonymise! }.
         to raise_error(
@@ -49,5 +50,6 @@ RSpec.context "ActiveRecord integration" do
           "Email address can't be blank",
         )
     end
+    # rubocop:enable RSpec/ExampleLength
   end
 end
