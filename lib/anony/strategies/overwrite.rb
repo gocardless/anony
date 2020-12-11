@@ -22,7 +22,7 @@ module Anony
       def initialize(model_class, &block)
         @model_class = model_class
         @anonymisable_fields = {}
-        instance_eval(&block) if block_given?
+        instance_eval(&block) if block
       end
 
       # A hash containing the fields and their anonymisation strategies.
@@ -88,7 +88,7 @@ module Anony
       # @example With a block
       #   with_strategy(:first_name, :last_name) { |previous| previous.reverse }
       def with_strategy(strategy, *fields, &block)
-        if block_given?
+        if block
           fields.unshift(strategy)
           strategy = block
         end
