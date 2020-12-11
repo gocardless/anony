@@ -18,7 +18,7 @@ jobs:
       - restore_cache:
           key: anony-bundler-{{ checksum "anony.gemspec" }}
 
-      - run: gem install bundler -v 2.1.4
+      - run: gem install bundler -v 2.2.0
       - run: bundle config set path 'vendor/bundle'
       - run: bundle install
 
