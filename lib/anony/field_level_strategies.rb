@@ -46,7 +46,7 @@ module Anony
     #     anonymise { forty_two :date_of_birth }
     #   end
     def self.register(name, klass_or_constant = nil, &block)
-      if block_given?
+      if block
         strategy = block
       elsif !klass_or_constant.nil?
         strategy = klass_or_constant

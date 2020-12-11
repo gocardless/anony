@@ -30,7 +30,7 @@ module Anony
       @model_class = model_class
       @strategy = UndefinedStrategy.new
       @skip_filter = nil
-      instance_exec(&block) if block_given?
+      instance_exec(&block) if block
     end
 
     # @api private
@@ -94,7 +94,7 @@ module Anony
     #     skip_if { !persisted? }
     #   end
     def skip_if(&if_condition)
-      raise ArgumentError, "Block required for :skip_if" unless block_given?
+      raise ArgumentError, "Block required for :skip_if" unless if_condition
 
       @skip_filter = if_condition
     end
