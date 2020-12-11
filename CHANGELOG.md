@@ -1,3 +1,7 @@
+# v1.0.2
+
+- Unpin ActiveSupport for Rails 6
+
 # v1.0.1
 
 * Throw a more useful exception when calling .anonymise without config [#53](https://github.com/gocardless/anony/pull/53)
