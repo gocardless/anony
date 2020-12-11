@@ -48,7 +48,9 @@ workflows:
           matrix:
             parameters:
               ruby-version: ["2.4", "2.5", "2.6", "2.7"]
-              rails-version: ["5.2", "6.0"]
+              rails-version: ["5.2", "6.0", "6.1"]
             exclude:
               - ruby-version: "2.4"
                 rails-version: "6.0"
+              - ruby-version: "2.4"
+                rails-version: "6.1"
