@@ -63,6 +63,7 @@ module Anony
     # @example
     #   manager = Manager.first
     #   manager.anonymise!
+    # rubocop:disable Metrics/AbcSize
     def anonymise!
       unless self.class.anonymise_config
         raise ArgumentError, "#{self.class.name} does not have an Anony configuration"
@@ -70,9 +71,12 @@ module Anony
 
       self.class.anonymise_config.validate!
       self.class.anonymise_config.apply(self)
+    rescue ActiveRecord::RecordInvalid => e
+      raise Anony::RecordInvalid, "#{self.class.name} - raised #{e.class.name} #{e.message}"
     rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
       Result.failed(e)
     end
+    # rubocop:enable Metrics/AbcSize
 
     # @!visibility private
     def self.included(base)
