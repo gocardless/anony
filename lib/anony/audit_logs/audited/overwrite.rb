@@ -125,6 +125,8 @@ module Anony
         # @example
         #   ignore :external_system_id, :externalised_at
         def ignore(*fields)
+          return if Anony::Config.ignored_by_default
+
           already_ignored = fields.select { |field| Anony::Config.ignore?(field) }
 
           if already_ignored.any?
@@ -136,14 +138,18 @@ module Anony
         end
 
         private def unhandled_fields
-          anonymisable_columns =
-            @model_class.column_names.map(&:to_sym).
-              reject { |c| Anony::Config.ignore?(c) }.
-              reject { |c| c == :anonymise_after || c == :anonymised_at }
+          return [] if Anony::Config.ignored_by_default
 
-          handled_fields = @anonymisable_fields.keys
+          @unhandled_fields ||= begin
+            anonymisable_columns =
+              @model_class.column_names.map(&:to_sym).
+                reject { |c| Anony::Config.ignore?(c) }.
+                reject { |c| c == :anonymise_after || c == :anonymised_at }
 
-          anonymisable_columns - handled_fields
+            handled_fields = @anonymisable_fields.keys
+
+            @unhandled_fields = anonymisable_columns - handled_fields
+          end
         end
 
         private def anonymise_field(audit_entry, field)

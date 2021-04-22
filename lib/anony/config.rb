@@ -12,7 +12,7 @@ module Anony
   #
   #   Anony::Config.ignore_fields(:id)
   module Config
-    mattr_accessor :ignores
+    mattr_accessor :ignores, :ignored_by_default
 
     # @!visibility private
     def self.ignore?(field)
@@ -38,5 +38,9 @@ module Anony
     end
 
     self.ignores = [:id, :created_at, :updated_at]
+
+    # Ignores all fields by default and will no longer raise an error if
+    # a strategy is not specified for a field.
+    self.ignored_by_default = false
   end
 end

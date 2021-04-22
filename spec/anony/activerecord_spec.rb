@@ -54,4 +54,47 @@ RSpec.context "ActiveRecord integration" do
     expect { instance.anonymise! }.
       to change(instance, :anonymised_at).from(nil).to be_within(1).of(Time.now)
   end
+
+  context "with ignored_by_default set in Anony::Config" do
+    around do |example|
+      begin
+        original_value = Anony::Config.ignored_by_default
+        Anony::Config.ignored_by_default = true
+        example.call
+      ensure
+        Anony::Config.ignored_by_default = original_value
+      end
+    end
+
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :employees
+
+        anonymise do
+          overwrite do
+            hex :first_name
+            ignore :last_name
+          end
+        end
+      end
+    end
+
+    it "should be valid configuration" do
+      expect(klass).to be_valid_anonymisation
+    end
+
+    it "should not complain about unhandled fields" do
+      expect { instance.anonymise! }.to_not raise_error
+    end
+
+    it "should anonymise specified fields" do
+      expect { instance.anonymise! }.to change(instance, :first_name)
+    end
+
+    it "should not anonymise unhandled fields" do
+      expect { instance.anonymise! }.to_not change(instance, :company_name)
+    end
+  end
 end
