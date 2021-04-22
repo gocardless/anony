@@ -5,6 +5,7 @@ require "active_support/core_ext/module/delegation"
 require_relative "./strategies/overwrite"
 require_relative "model_config"
 require_relative "anonymisable_models"
+require_relative "anonymisation_not_known_exception"
 
 module Anony
   # The main Anony object to include in your ActiveRecord class.
@@ -77,6 +78,11 @@ module Anony
       Result.failed(e)
     end
 
+    def anonymised?
+      raise AnonymisationNotKnownException unless respond_to?(:anonymised_at)
+      anonymised_at.present?
+    end
+
     private def should_anonymise?(ignore_anonymisation_date)
       return true if ignore_anonymisation_date || !respond_to?(:anonymise_after)
 
@@ -86,6 +92,12 @@ module Anony
     # @!visibility private
     def self.included(base)
       base.extend(ClassMethods)
+
+      base.class_eval do
+        scope :exposed, -> { where(anonymised_at: nil) }
+        scope :anonymised, -> { where.not(anonymised_at: nil) }
+        scope :due_for_anonymisation, -> { where('anonymise_after < CURRENT_DATE').exposed }
+      end
 
       AnonymisableModels.add(base)
     end

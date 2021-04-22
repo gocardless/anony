@@ -32,6 +32,21 @@ ActiveRecord::Schema.define do
     t.datetime :anonymised_at
   end
 
+  create_table :without_anonymised_at do |t|
+    t.string :first_name
+  end
+
+  create_table :without_anonymised_after do |t|
+    t.string :first_name
+    t.datetime :anonymised_at
+  end
+
+  create_table :with_anonymise_after do |t|
+    t.string :first_name
+    t.datetime :anonymised_at
+    t.date :anonymise_after
+  end
+
   # TODO: Extract into extension gem
   create_table :audits do |t|
     t.column :auditable_id, :integer

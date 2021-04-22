@@ -109,6 +109,10 @@ RSpec.describe Anony::Anonymisable do
         it { expect { model.anonymise! }.to_not change(model, :phone_number) }
         it { expect { model.anonymise! }.to_not change(model, :onboarded_at) }
       end
+
+      it "changes status of anonymised? after anonymisation" do
+        expect { model.anonymise! }.to change { model.anonymised? }.from(false).to(true)
+      end
     end
 
     describe "#valid_anonymisation?" do
@@ -117,6 +121,113 @@ RSpec.describe Anony::Anonymisable do
           expect(klass).to be_valid_anonymisation
         end
       end
+    end
+  end
+
+  context "without anonymised_at field" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :without_anonymised_at
+
+        anonymise do
+          overwrite do
+            with_strategy 'REDACTED', :first_name
+          end
+        end
+      end
+    end
+
+    let(:model) do
+      klass.new(first_name: "abc")
+    end
+
+    it "raises error when checking if record was anonymised" do
+      expect { model.anonymised? }.to raise_error(Anony::AnonymisationNotKnownException)
+    end
+
+    it "raises error when querying for anonymised records" do
+      expect { klass.anonymised.to_a }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+
+    it "raises error when querying for exposed records" do
+      expect { klass.exposed.to_a }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+
+    it "raises error when querying for anonymisation due records" do
+      expect { klass.due_for_anonymisation.to_a }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
+
+  context "without anonymised_after field" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :without_anonymised_after
+
+        anonymise do
+          overwrite do
+            with_strategy 'REDACTED', :first_name
+          end
+        end
+      end
+    end
+
+    before do
+      klass.create(first_name: "John", anonymised_at: nil)
+      klass.create(first_name: "Greg", anonymised_at: 1.day.ago)
+    end
+
+    after do
+      klass.delete_all
+    end
+
+    it "returns exposed records" do
+      results = klass.exposed
+      expect(results.collect(&:first_name)).to match_array(%w(John))
+    end
+
+    it "returns anonymised records" do
+      results = klass.anonymised
+      expect(results.collect(&:first_name)).to match_array(%w(Greg))
+    end
+
+    it "raises error when querying for anonymisation due records" do
+      expect { klass.due_for_anonymisation.to_a }.to raise_error(ActiveRecord::StatementInvalid)
+    end
+  end
+
+  context "with anonymised_after field" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :with_anonymise_after
+
+        anonymise do
+          overwrite do
+            with_strategy 'REDACTED', :first_name
+          end
+        end
+      end
+    end
+
+    before do
+      klass.create(first_name: "John", anonymise_after: nil)
+      klass.create(first_name: "Greg", anonymise_after: 1.day.ago)
+      klass.create(first_name: "Derek", anonymise_after: 1.day.ago, anonymised_at: 1.day.ago)
+      klass.create(first_name: "Bob", anonymise_after: 1.day.from_now)
+    end
+
+    after do
+      klass.delete_all
+    end
+
+    it "returns exposed records where anonymise_after is not nil and in the past" do
+      results = klass.due_for_anonymisation
+      expect(results.collect(&:first_name)).to match_array(%w(Greg))
     end
   end
 
