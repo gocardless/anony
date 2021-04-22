@@ -125,7 +125,7 @@ module Anony
         # @example
         #   ignore :external_system_id, :externalised_at
         def ignore(*fields)
-          already_ignored = fields.select { |field| Config.ignore?(field) }
+          already_ignored = fields.select { |field| Anony::Config.ignore?(field) }
 
           if already_ignored.any?
             raise ArgumentError, "Cannot ignore #{already_ignored.inspect} " \
