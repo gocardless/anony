@@ -33,6 +33,13 @@ Gem::Specification.new do |spec|
   # For integration testing
   spec.add_development_dependency "sqlite3", "~> 1.4.1"
 
+  # Required by Audited gem for resolving current Rails version
+  # TODO: This dependency should live in an extension gem
+  spec.add_development_dependency "rails", ">= 5.2"
+
   spec.add_dependency "activerecord", ">= 5.2", "< 7"
   spec.add_dependency "activesupport", ">= 5.2", "< 7"
+
+  # TODO: Extract support for various auditing gems out into extension gems.
+  spec.add_runtime_dependency "audited", ">= 4.9", "< 5"
 end

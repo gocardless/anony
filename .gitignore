@@ -12,3 +12,5 @@
 
 # Libraries shouldn't check in Gemfile.lock
 Gemfile.lock
+
+/.idea/

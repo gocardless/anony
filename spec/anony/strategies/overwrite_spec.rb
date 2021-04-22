@@ -87,7 +87,7 @@ RSpec.describe Anony::Strategies::Overwrite do
 
         self.table_name = :only_anonymised
         anonymise do
-          overwrite { ignore :id }
+          overwrite { }
         end
       end
     end

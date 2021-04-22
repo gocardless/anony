@@ -136,11 +136,11 @@ module Anony
         anonymisable_columns =
           @model_class.column_names.map(&:to_sym).
             reject { |c| Config.ignore?(c) }.
-            reject { |c| c == :anonymised_at }
+            reject { |c| c == :anonymise_after || c == :anonymised_at }
 
         handled_fields = @anonymisable_fields.keys
 
-        anonymisable_columns - handled_fields
+        @unhandled_fields ||= anonymisable_columns - handled_fields
       end
 
       private def anonymise_field(instance, field)

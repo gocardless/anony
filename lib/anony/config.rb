@@ -28,7 +28,7 @@ module Anony
     # helpful in Rails applications when there are common columns such as `id`,
     # `created_at` and `updated_at`, which we would never want to try and anonymise.
     #
-    # By default, this is an empty collection (i.e. no fields are ignored).
+    # By default, common Rails columns are ignored (i.e. id, created_at, updated_at).
     #
     # @param [Array<Symbol>] fields A list of fields names to ignore.
     # @example Ignoring common Rails fields
@@ -37,6 +37,6 @@ module Anony
       self.ignores = Array(fields)
     end
 
-    self.ignores = []
+    self.ignores = [:id, :created_at, :updated_at]
   end
 end

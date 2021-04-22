@@ -17,7 +17,6 @@ RSpec.context "ActiveRecord integration" do
 
       anonymise do
         overwrite do
-          ignore :id
           hex :first_name
           nilable :last_name
           email :email_address

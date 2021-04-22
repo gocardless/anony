@@ -19,7 +19,6 @@ RSpec.describe Anony::Anonymisable do
 
         anonymise do
           overwrite do
-            ignore :id
             with_strategy StubAnoynmiser, :company_name
             with_strategy(:first_name) { |v, _| v.reverse }
             with_strategy(:last_name) { some_instance_method? ? "yes" : "no" }
@@ -42,18 +41,68 @@ RSpec.describe Anony::Anonymisable do
     end
 
     describe "#anonymise!" do
-      it "anonymises fields" do
-        expect { model.anonymise! }.
-          to change(model, :company_name).to("OVERWRITTEN DATA").
-          and change(model, :first_name).to("cba").
-          and change(model, :last_name).to("yes").
-          and change(model, :email_address).to("none@example.com")
+      context "anonymise_after in the past" do
+        let(:model) do
+          klass.new(first_name: "abc", last_name: "foo", anonymise_after: 1.day.ago.to_date)
+        end
+
+        it "anonymises fields" do
+          expect { model.anonymise! }.
+            to change(model, :company_name).to("OVERWRITTEN DATA").
+            and change(model, :first_name).to("cba").
+            and change(model, :last_name).to("yes").
+            and change(model, :email_address).to("none@example.com")
+        end
+
+
+        it "saves the model" do
+          expect(model).to receive(:save!)
+
+          model.anonymise!
+        end
       end
 
-      it "saves the model" do
-        expect(model).to receive(:save!)
+      context "anonymise_after in the future" do
+        let(:model) do
+          klass.new(first_name: "abc", last_name: "foo", anonymise_after: 1.day.from_now.to_date)
+        end
 
-        model.anonymise!
+        it "skips anonymisation" do
+          result = model.anonymise!
+          expect(result).to be_skipped
+        end
+
+        context "ignoring expected anonymisation date" do
+          it "performs anonymisation" do
+            result = model.anonymise!(ignore_anonymisation_date: true)
+            expect(result).to be_overwritten
+          end
+
+          it "anonymises fields" do
+            expect { model.anonymise!(ignore_anonymisation_date: true) }.to change(model, :first_name)
+          end
+        end
+      end
+
+      context "anonymise_after nil" do
+        let(:model) do
+          klass.new(first_name: "abc", last_name: "foo", anonymise_after: nil)
+        end
+
+        it "anonymises fields" do
+          expect { model.anonymise! }.
+            to change(model, :company_name).to("OVERWRITTEN DATA").
+              and change(model, :first_name).to("cba").
+                and change(model, :last_name).to("yes").
+                  and change(model, :email_address).to("none@example.com")
+        end
+
+
+        it "saves the model" do
+          expect(model).to receive(:save!)
+
+          model.anonymise!
+        end
       end
 
       context "ignored fields" do
@@ -270,7 +319,6 @@ RSpec.describe Anony::Anonymisable do
 
         anonymise do
           overwrite do
-            ignore :id
             hex :first_name
             nilable :last_name
             email :email_address

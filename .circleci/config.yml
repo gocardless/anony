@@ -38,7 +38,7 @@ jobs:
       - store_test_results:
           path: /tmp/test-results
 
-      - run: bundle exec rubocop --parallel --extra-details --display-style-guide
+#      - run: bundle exec rubocop --parallel --extra-details --display-style-guide
 
 workflows:
   version: 2

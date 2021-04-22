@@ -2,6 +2,7 @@
 
 module Anony
   require_relative "anony/anonymisable"
+  require_relative "anony/anonymisable_models"
   require_relative "anony/config"
   require_relative "anony/duplicate_strategy_exception"
   require_relative "anony/field_exception"

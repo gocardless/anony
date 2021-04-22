@@ -9,7 +9,8 @@ module Anony
     OVERWRITTEN = "overwritten"
     SKIPPED = "skipped"
 
-    attr_reader :status, :fields, :error
+    attr_reader :status, :fields, :audit_log_changes, :error
+    attr_writer :audit_log_changes
 
     delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
 
@@ -34,6 +35,7 @@ module Anony
 
       @status = ActiveSupport::StringInquirer.new(status)
       @fields = fields
+      @audit_log_changes = []
       @error = error
     end
   end
