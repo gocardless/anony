@@ -31,7 +31,7 @@ RSpec.context "ActiveRecord integration using Audited gem" do
           email :email_address
           phone_number :phone_number
           current_datetime :onboarded_at
-          with_strategy(:company_name) { |old| "anonymised-#{old}" }
+          ignore :company_name
         end
       end
     end
@@ -86,7 +86,7 @@ RSpec.context "ActiveRecord integration using Audited gem" do
 
   context "with updates to record" do
     before do
-      instance.update!(first_name: "John", last_name: "Smith")
+      instance.update!(first_name: "John", last_name: "Smith", company_name: "Apple")
     end
 
     it "should have an audit entry for create and update" do
@@ -100,7 +100,8 @@ RSpec.context "ActiveRecord integration using Audited gem" do
     it "anonymises create audit entries" do
       expect { instance.anonymise! }.
         to change { instance.audits.first.audited_changes['first_name'] }.from('William').to('REDACTED').
-          and change { instance.audits.first.audited_changes['last_name'] }.from('Gates').to(nil)
+          and change { instance.audits.first.audited_changes['last_name'] }.from('Gates').to(nil).
+            and not_change { instance.audits.first.audited_changes['company_name'] }.from('Microsoft')
     end
 
     it "anonymises update audit entries" do
@@ -108,7 +109,9 @@ RSpec.context "ActiveRecord integration using Audited gem" do
         to change { instance.audits.last.audited_changes['first_name'].first }.from('William').to('REDACTED').
           and change { instance.audits.last.audited_changes['first_name'].second }.from('John').to('REDACTED').
             and change { instance.audits.last.audited_changes['last_name'].first }.from('Gates').to(nil).
-              and change { instance.audits.last.audited_changes['last_name'].second }.from('Smith').to(nil)
+              and change { instance.audits.last.audited_changes['last_name'].second }.from('Smith').to(nil).
+                and not_change { instance.audits.last.audited_changes['company_name'].first }.from('Microsoft').
+                  and not_change { instance.audits.last.audited_changes['company_name'].second }.from('Apple')
     end
   end
 
