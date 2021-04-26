@@ -86,7 +86,7 @@ module Anony
     private def should_anonymise?(ignore_anonymisation_date)
       return true if ignore_anonymisation_date || !respond_to?(:anonymise_after)
 
-      anonymise_after.nil? || !anonymise_after.future?
+      anonymise_after.nil? || anonymise_after.past?
     end
 
     # @!visibility private
