@@ -7,3 +7,6 @@ AllCops:
 
 Layout/LineLength:
   Max: 100
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false

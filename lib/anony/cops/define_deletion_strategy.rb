@@ -24,7 +24,7 @@ module RuboCop
       #   class MyNewThing < ApplicationRecord; end
       class DefineDeletionStrategy < Cop
         MSG = "Define .anonymise for %<model>s, see https://github.com/gocardless/" \
-              "anony/blob/#{Anony::VERSION}/README.md for details"
+              "anony/blob/#{Anony::VERSION}/README.md for details".freeze
 
         def_node_search :uses_anonymise?, "(send nil? :anonymise)"
 

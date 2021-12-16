@@ -7,11 +7,9 @@ RSpec.describe Anony::FieldLevelStrategies do
     let(:name) { :reverse }
 
     after do
-      begin
-        described_class.undef_method(name)
-      rescue StandardError
-        nil
-      end
+      described_class.undef_method(name)
+    rescue StandardError
+      nil
     end
 
     context "with a block" do
