@@ -126,7 +126,7 @@ module Anony
 
         if already_ignored.any?
           raise ArgumentError, "Cannot ignore #{already_ignored.inspect} " \
-                              "(fields already ignored in Anony::Config)"
+                               "(fields already ignored in Anony::Config)"
         end
 
         no_op(*fields)
