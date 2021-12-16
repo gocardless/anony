@@ -1,3 +1,8 @@
+# v1.1.0
+
+- Drop ruby 2.4 and 2.5 support
+- Unpin ActiveSupport for Rails 7
+
 # v1.0.2
 
 - Unpin ActiveSupport for Rails 6

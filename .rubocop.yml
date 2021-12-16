@@ -3,7 +3,10 @@ inherit_gem:
   gc_ruboconfig: rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 3.0
 
 Layout/LineLength:
   Max: 100
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false

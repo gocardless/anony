@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = ">= 2.4"
+  spec.required_ruby_version = ">= 2.6"
 
   spec.add_development_dependency "bundler", "~> 2.2.0"
   spec.add_development_dependency "gc_ruboconfig", "~> 2.24.0"
@@ -33,6 +33,6 @@ Gem::Specification.new do |spec|
   # For integration testing
   spec.add_development_dependency "sqlite3", "~> 1.4.1"
 
-  spec.add_dependency "activerecord", ">= 5.2", "< 7"
-  spec.add_dependency "activesupport", ">= 5.2", "< 7"
+  spec.add_dependency "activerecord", ">= 5.2", "< 8"
+  spec.add_dependency "activesupport", ">= 5.2", "< 8"
 end
