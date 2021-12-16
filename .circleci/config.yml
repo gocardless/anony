@@ -9,7 +9,7 @@ jobs:
         type: string
 
     docker:
-      - image: ruby:<<parameters.ruby-version>>
+      - image: cimg/ruby:<<parameters.ruby-version>>
         environment:
           - RAILS_VERSION=<<parameters.rails-version>>
     steps:
@@ -47,10 +47,5 @@ workflows:
       - test:
           matrix:
             parameters:
-              ruby-version: ["2.4", "2.5", "2.6", "2.7"]
-              rails-version: ["5.2", "6.0", "6.1"]
-            exclude:
-              - ruby-version: "2.4"
-                rails-version: "6.0"
-              - ruby-version: "2.4"
-                rails-version: "6.1"
+              ruby-version: ["2.6", "2.7", "3.0"]
+              rails-version: ["6.0", "6.1", "7.0"]
