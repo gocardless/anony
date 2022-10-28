@@ -24,6 +24,8 @@ jobs:
           - ruby-version: 2.6
             rails-version: 7.0
     runs-on: ubuntu-latest
+    env:
+      RAILS_VERSION: ${{ matrix.rails-version }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby
