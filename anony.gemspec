@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activerecord", ">= 5.2", "< 8"
   spec.add_dependency "activesupport", ">= 5.2", "< 8"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

@@ -116,7 +116,7 @@ RSpec.describe Anony::FieldLevelStrategies do
 
     let(:value) { "old value" }
 
-    it { is_expected.to be nil }
+    it { is_expected.to be_nil }
   end
 
   describe ":no_op strategy" do
