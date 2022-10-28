@@ -24,10 +24,10 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.6"
 
-  spec.add_development_dependency "bundler", "~> 2.2.0"
-  spec.add_development_dependency "gc_ruboconfig", "~> 2.29.0"
+  spec.add_development_dependency "bundler", "~> 2"
+  spec.add_development_dependency "gc_ruboconfig", "~> 3.6.0"
   spec.add_development_dependency "rspec", "~> 3.9"
-  spec.add_development_dependency "rspec_junit_formatter", "~> 0.4"
+  spec.add_development_dependency "rspec-github", "~> 2.3.1"
   spec.add_development_dependency "yard", "~> 0.9.20"
 
   # For integration testing
@@ -35,4 +35,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activerecord", ">= 5.2", "< 8"
   spec.add_dependency "activesupport", ">= 5.2", "< 8"
+  spec.metadata["rubygems_mfa_required"] = "true"
 end

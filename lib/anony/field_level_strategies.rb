@@ -147,7 +147,7 @@ module Anony
     #   end
     OverwriteHex = Struct.new(:max_length) do
       def call(_existing_value)
-        hex_length = max_length / 2 + 1
+        hex_length = (max_length / 2) + 1
         SecureRandom.hex(hex_length)[0, max_length]
       end
     end
