@@ -54,6 +54,23 @@ module Anony
         @anonymise_config.valid?
       end
 
+      # Finds the records that relate to a particular subject and runs anonymise on
+      # each of them. If a selector is not defined it will raise an exception.
+      def anonymise_for!(subject, subject_id)
+        anonymise_config.
+          select(subject, subject_id, &:anonymise!)
+      end
+
+      # Checks if a selector has been defined for a given subject.
+      # This is useful for when writing tests to check all models have a valid selector
+      # for a given subject.
+      # @return [Boolean]
+      # @example
+      #   Manager.selector_for?(:user_id)
+      def selector_for?(subject)
+        anonymise_config.selector_for?(subject)
+      end
+
       attr_reader :anonymise_config
     end
 
@@ -72,6 +89,10 @@ module Anony
       self.class.anonymise_config.apply(self)
     rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
       Result.failed(e)
+    end
+
+    def anonymised?
+      anonymised_at.present?
     end
 
     # @!visibility private

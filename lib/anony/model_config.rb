@@ -4,6 +4,7 @@ require "active_support/core_ext/module/delegation"
 
 require_relative "./strategies/destroy"
 require_relative "./strategies/overwrite"
+require_relative "./selectors"
 
 module Anony
   class ModelConfig
@@ -29,6 +30,7 @@ module Anony
     def initialize(model_class, &block)
       @model_class = model_class
       @strategy = UndefinedStrategy.new
+      @selectors_config = nil
       @skip_filter = nil
       instance_exec(&block) if block
     end
@@ -84,6 +86,34 @@ module Anony
       end
 
       @strategy = Strategies::Overwrite.new(@model_class, &block)
+    end
+
+    # Define selectors to select records that apply to a particular subject.
+    # This method taks a configuration block that then builds Selectors
+    #
+    # @see Anony::Selectors
+    #
+    # @example
+    #
+    #   anonymise do
+    #     selectors do
+    #       for_subject(:user_id) { |user_id| self.select_for_user(user_id) }
+    #     end
+    #   end
+    #
+    #   ModelName.anonymise_for!(:user_id, "user_1234")
+    def selectors(&block)
+      @selectors_config = Selectors.new(@model_class, &block)
+    end
+
+    def select(subject, subject_id, &block)
+      @selectors_config.select(subject, subject_id, &block)
+    end
+
+    def selector_for?(subject)
+      return nil if @selectors_config.nil?
+
+      @selectors_config.selectors[subject].present?
     end
 
     # Prevent any anonymisation strategy being applied when the provided block evaluates

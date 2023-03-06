@@ -4,9 +4,13 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 3.0
+  NewCops: enable
 
 Layout/LineLength:
   Max: 100
 
 Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+RSpec/MultipleExpectations:
   Enabled: false
