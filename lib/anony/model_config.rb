@@ -47,6 +47,7 @@ module Anony
     end
 
     delegate :valid?, :validate!, to: :@strategy
+    delegate :select, to: :@selectors_config
 
     # Use the deletion strategy instead of anonymising individual fields. This method is
     # incompatible with the fields strategy.
@@ -104,10 +105,6 @@ module Anony
     #   ModelName.anonymise_for!(:user_id, "user_1234")
     def selectors(&block)
       @selectors_config = Selectors.new(@model_class, &block)
-    end
-
-    def select(subject, subject_id, &block)
-      @selectors_config.select(subject, subject_id, &block)
     end
 
     def selector_for?(subject)

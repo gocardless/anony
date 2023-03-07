@@ -16,12 +16,11 @@ module Anony
       selectors[subject] = block
     end
 
-    def select(subject, subject_id, &block)
+    def select(subject, subject_id)
       selector = selectors[subject]
       raise SelectorNotFoundException.new(subject.to_s, @model_class.name) if selector.nil?
 
-      matching = @model_class.instance_exec(subject_id, &selector)
-      matching.map(&block)
+      @model_class.instance_exec(subject_id, &selector)
     end
   end
 end

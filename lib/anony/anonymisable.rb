@@ -2,6 +2,7 @@
 
 require "active_support/core_ext/module/delegation"
 
+require_relative "./not_anonymisable_exception"
 require_relative "./strategies/overwrite"
 require_relative "model_config"
 
@@ -57,8 +58,15 @@ module Anony
       # Finds the records that relate to a particular subject and runs anonymise on
       # each of them. If a selector is not defined it will raise an exception.
       def anonymise_for!(subject, subject_id)
-        anonymise_config.
-          select(subject, subject_id, &:anonymise!)
+        records = anonymise_config.
+          select(subject, subject_id)
+        records.map do |record|
+          if !record.respond_to?(:anonymise!)
+            raise NotAnonymisableException, record
+          end
+
+          record.anonymise!
+        end
       end
 
       # Checks if a selector has been defined for a given subject.
