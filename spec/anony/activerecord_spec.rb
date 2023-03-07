@@ -34,9 +34,9 @@ RSpec.context "ActiveRecord integration" do
   # rubocop:disable RSpec/ExampleLength
   it "applies the correct changes to each column" do
     expect { instance.anonymise! }.
-      to change(instance, :first_name).to(/[\h\-]{36}/).
+      to change(instance, :first_name).to(/[\h-]{36}/).
       and change(instance, :last_name).to(nil).
-      and change(instance, :email_address).to(/[\h\-]@example.com/).
+      and change(instance, :email_address).to(/[\h-]@example.com/).
       and change(instance, :phone_number).to("+1 617 555 1294").
       and change(instance, :company_name).to("anonymised-Microsoft").
       and change(instance, :onboarded_at).to be_within(1).of(Time.now)

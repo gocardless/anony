@@ -15,9 +15,24 @@ RSpec.describe Anony::Anonymisable do
       Class.new(ActiveRecord::Base) do
         include Anony::Anonymisable
 
+        # give this anon class a name
+        def self.name
+          "Employee"
+        end
+
         self.table_name = :employees
 
         anonymise do
+          selectors do
+            for_subject(:first_name) do |first_name|
+              where(first_name: first_name)
+            end
+
+            for_subject(:company_name) do |company_name|
+              where(company_name: company_name)
+            end
+          end
+
           overwrite do
             ignore :id
             with_strategy StubAnoynmiser, :company_name
@@ -38,7 +53,35 @@ RSpec.describe Anony::Anonymisable do
     end
 
     let(:model) do
-      klass.new(first_name: "abc", last_name: "foo")
+      klass.create!(first_name: "abc", last_name: "foo", company_name: "alpha")
+    end
+
+    describe ".anonymise_for!" do
+      let!(:model_b) do
+        klass.create!(first_name: "matt", last_name: "brown", company_name: "alpha")
+      end
+
+      context "selector not found" do
+        it "raises an error" do
+          expect do
+            klass.anonymise_for!(:random, "hello")
+          end.to raise_error(Anony::SelectorNotFoundException)
+        end
+      end
+
+      context "single record" do
+        it "changes the matching record" do
+          klass.anonymise_for!(:first_name, model.first_name)
+          expect(model.reload.anonymised?).to eq(true)
+          expect(model_b.reload.anonymised?).to eq(false)
+        end
+      end
+
+      it "anonymises only the matching models: company_name" do
+        klass.anonymise_for!(:company_name, model.company_name)
+        expect(model.reload.anonymised?).to be(true)
+        expect(model_b.reload.anonymised?).to be(true)
+      end
     end
 
     describe "#anonymise!" do

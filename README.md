@@ -243,6 +243,42 @@ irb(main):003:0> manager
  => #<Manager first_name="e9ab2800-d4b9-4227-94a7-7f81118d8a8a" last_name="previous-name-of-42">
 ```
 
+### Anonymising many records, or anonymising by subject
+
+**Note**: This is an experimental feature and has not been tested widely
+in production environments.
+
+You can use selectors to anonymise multiple records. You first define a block for
+a specific subject that returns a list of anonymisable records.
+
+```ruby
+anonymise do
+  selectors do
+    for_subject(:user_id) { |user_id| find_all_users(user_id) }
+  end
+end
+```
+
+You can also use `scopes`, `where`, etc when defining your selectors:
+
+```ruby
+anonymise do
+  selectors do
+    for_subject(:user_id) { |user_id| where(user_id: user_id) }
+  end
+end
+```
+
+This can then be used to anonymise all those subject using this API:
+
+```ruby
+ModelName.anonymise_for!(:user_id, "user_1234")
+```
+
+If you attempt to anonymise records with a selector that has not been defined it
+will throw an error.
+
+
 ### Identifying anonymised records
 
 If your model has an `anonymised_at` column, Anony will automatically set that value
@@ -279,6 +315,12 @@ Records can then be filtered out like so:
 class Employees < ApplicationRecord
   scope :without_anonymised, -> { where(anonymised_at: nil) }
 end
+```
+
+There is also a helper defined when `Anony::Anonymisable" is included:
+
+```ruby
+Employees.anonymised?
 ```
 
 ### Preventing anonymisation
@@ -364,6 +406,7 @@ Anony::Config.ignore_fields(:id, :created_at, :updated_at)
 
 By default, `Config.ignore_fields` is an empty array and all fields are considered
 anonymisable.
+
 
 ## Testing
 

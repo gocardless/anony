@@ -82,7 +82,7 @@ RSpec.describe Anony::FieldLevelStrategies do
 
     let(:value) { "old value" }
 
-    it { is_expected.to match(/^[0-9a-f\-]+@example.com$/) }
+    it { is_expected.to match(/^[0-9a-f-]+@example.com$/) }
   end
 
   describe ":phone_number strategy" do
