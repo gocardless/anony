@@ -489,7 +489,7 @@ Lint/DefineDeletionStrategy:
   ModelSuperclass: Acme::Record
 ```
 
-If your models use multiple superclasses, you can specify a list of superclasses in your `.rubocop.yml`:
+If your models use multiple superclasses, you can specify a list of superclasses in your `.rubocop.yml`. Note that you will have to specify `ApplicationRecord` explicitly in this list should you want to lint all models which inherit from `ApplicationRecord`.
 ```yml
 Lint/DefineDeletionStrategy:
   ModelSuperclass: 
