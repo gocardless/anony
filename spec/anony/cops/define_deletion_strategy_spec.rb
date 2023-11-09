@@ -94,4 +94,48 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy do
       it_behaves_like "an offense"
     end
   end
+
+  context "when it uses multiple super classes" do
+    subject(:offenses) { cop.offenses }
+
+    let(:cop_config) { { "ModelSuperclass" => ["Acme::Record", "Another::Record"] } }
+
+    context "when models defines anonymisation rules" do
+      let(:source) do
+        <<~RUBY
+          class Employee < Acme::Record
+            anonymise do
+              destroy
+            end
+          end
+
+          class Boss < Another::Record
+            anonymise do
+              destroy
+            end
+          end
+        RUBY
+      end
+
+      it { expect(cop.offenses).to be_empty }
+    end
+
+    context "when models are missing anonymisation rules" do
+      let(:source) do
+        <<~RUBY
+          class Employee < Another::Record
+          end
+
+          class Boss < Another::Record
+          end
+        RUBY
+      end
+
+      it { expect(offenses.count).to eq(2) }
+
+      it "has the correct name" do
+        expect(offenses.first.cop_name).to eq(cop.name)
+      end
+    end
+  end
 end
