@@ -46,7 +46,11 @@ module RuboCop
 
         def model_superclass_name
           if cop_config["ModelSuperclass"]
-            cop_config["ModelSuperclass"].is_a?(Array) ? cop_config["ModelSuperclass"] : [cop_config["ModelSuperclass"]]
+            if cop_config["ModelSuperclass"].is_a?(Array)
+              cop_config["ModelSuperclass"]
+            else
+              [cop_config["ModelSuperclass"]]
+            end
           else
             ["ApplicationRecord"]
           end
