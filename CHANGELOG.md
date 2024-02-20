@@ -1,6 +1,7 @@
 # v1.2.0
 
 - Add support for configuring multiple superclasses for the `DefineDeletionStrategy` cop [#98](https://github.com/gocardless/anony/pull/98)
+- Introduce helpers (selectors) for anonymising all a subject's records [#97](https://github.com/gocardless/anony/pull/97)
 
 # v1.1.0
 
