@@ -9,6 +9,9 @@ AllCops:
 Layout/LineLength:
   Max: 100
 
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
 Gemspec/RequiredRubyVersion:
   Enabled: false
 
