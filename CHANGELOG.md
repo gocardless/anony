@@ -1,3 +1,7 @@
+# v1.2.0
+
+- Add support for configuring multiple superclasses for the `DefineDeletionStrategy` cop [#98](https://github.com/gocardless/anony/pull/98)
+
 # v1.1.0
 
 - Drop ruby 2.4 and 2.5 support
