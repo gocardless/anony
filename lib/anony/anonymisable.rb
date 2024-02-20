@@ -2,8 +2,8 @@
 
 require "active_support/core_ext/module/delegation"
 
-require_relative "./not_anonymisable_exception"
-require_relative "./strategies/overwrite"
+require_relative "not_anonymisable_exception"
+require_relative "strategies/overwrite"
 require_relative "model_config"
 
 module Anony

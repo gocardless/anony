@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "./selector_not_found_exception"
+require_relative "selector_not_found_exception"
 
 module Anony
   class Selectors

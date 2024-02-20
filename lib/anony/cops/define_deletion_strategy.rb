@@ -36,9 +36,8 @@ module RuboCop
         end
 
         def model?(node)
-          return unless (superclass = node.children[1])
-
-          superclass.const_name == model_superclass_name
+          superclass = node.children[1]
+          model_superclass_name.include? superclass&.const_name
         end
 
         def class_name(node)
@@ -46,7 +45,15 @@ module RuboCop
         end
 
         def model_superclass_name
-          cop_config["ModelSuperclass"] || "ApplicationRecord"
+          unless cop_config["ModelSuperclass"]
+            return ["ApplicationRecord"]
+          end
+
+          if cop_config["ModelSuperclass"].is_a?(Array)
+            return cop_config["ModelSuperclass"]
+          end
+
+          [cop_config["ModelSuperclass"]]
         end
       end
     end

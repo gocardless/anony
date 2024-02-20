@@ -2,9 +2,9 @@
 
 require "active_support/core_ext/module/delegation"
 
-require_relative "./strategies/destroy"
-require_relative "./strategies/overwrite"
-require_relative "./selectors"
+require_relative "strategies/destroy"
+require_relative "strategies/overwrite"
+require_relative "selectors"
 
 module Anony
   class ModelConfig
@@ -108,7 +108,7 @@ module Anony
     end
 
     def selector_for?(subject)
-      return nil if @selectors_config.nil?
+      return false if @selectors_config.nil?
 
       @selectors_config.selectors[subject].present?
     end
