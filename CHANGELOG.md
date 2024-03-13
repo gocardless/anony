@@ -1,3 +1,7 @@
+# v2.0.0
+
+- Add support for Ruby 3.2, 3.3 and Rails 7.1
+
 # v1.2.0
 
 - Add support for configuring multiple superclasses for the `DefineDeletionStrategy` cop [#98](https://github.com/gocardless/anony/pull/98)
