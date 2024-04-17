@@ -1,6 +1,7 @@
-# v2.0.0
+# v1.3.0
 
 - Add support for Ruby 3.2, 3.3 and Rails 7.1
+- Drop support for EOL Ruby 2.6, 2.7 and Rails 6.0
 
 # v1.2.0
 
