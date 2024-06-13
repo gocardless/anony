@@ -405,4 +405,67 @@ RSpec.describe Anony::Anonymisable do
       expect(a_class.anonymise_config).to_not eq(b_class.anonymise_config)
     end
   end
+
+  context "with two associated models" do
+    Anony.const_set(:EmployeePet, Class.new(ActiveRecord::Base) do
+      include Anony::Anonymisable
+
+      # give this anon class a name
+      def self.name
+        "EmployeePet"
+      end
+
+      self.table_name = :employee_pets
+
+      belongs_to :employee, class_name: "Anony::Employee"
+
+      anonymise do
+        overwrite do
+          ignore :id, :employee_id, :first_name, :animal
+          nilable :last_name
+        end
+      end
+    end)
+
+    Anony.const_set(:Employee, Class.new(ActiveRecord::Base) do
+      include Anony::Anonymisable
+
+      # give this anon class a name
+      def self.name
+        "Employee"
+      end
+
+      self.table_name = :employees
+
+      has_many :employee_pets, class_name: "Anony::EmployeePet"
+
+      anonymise do
+        overwrite do
+          ignore :id
+          with_strategy StubAnoynmiser, :company_name, :first_name
+          nilable :last_name, :email_address
+          ignore :phone_number, :onboarded_at
+        end
+
+        selectors do
+          for_associations :employee_pets
+        end
+      end
+    end)
+
+    let!(:child_model) do
+      Anony::EmployeePet.create!(first_name: "jeremy", last_name: "splashington", animal: "fish",
+                                 employee: parent_model)
+    end
+
+    let(:parent_model) do
+      Anony::Employee.create!(first_name: "abc", last_name: "foo", company_name: "alpha")
+    end
+
+    it "anonymises the configured associated model when we anonymise the parent" do
+      parent_model.anonymise!
+      expect(parent_model.reload.anonymised?).to be(true)
+      expect(child_model.reload.anonymised?).to be(true)
+    end
+  end
 end

@@ -1,3 +1,7 @@
+# v1.4.0
+
+- Add `for_association` selector for anonymising related models
+
 # v1.3.0
 
 - Add support for Ruby 3.2, 3.3 and Rails 7.1

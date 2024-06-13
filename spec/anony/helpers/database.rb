@@ -21,6 +21,14 @@ ActiveRecord::Schema.define do
     t.datetime :anonymised_at
   end
 
+  create_table :employee_pets do |t|
+    t.string :first_name, null: false
+    t.string :last_name
+    t.string :animal, null: false
+    t.datetime :anonymised_at
+    t.belongs_to :employee
+  end
+
   create_table :only_ids
 
   create_table :a_fields, id: false do |t|
