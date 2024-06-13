@@ -48,6 +48,7 @@ module Anony
 
     delegate :valid?, :validate!, to: :@strategy
     delegate :select, to: :@selectors_config
+    delegate :associations, to: :@selectors_config, allow_nil: true
 
     # Use the deletion strategy instead of anonymising individual fields. This method is
     # incompatible with the fields strategy.

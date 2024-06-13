@@ -94,7 +94,18 @@ module Anony
       end
 
       self.class.anonymise_config.validate!
-      self.class.anonymise_config.apply(self)
+      result = self.class.anonymise_config.apply(self)
+
+      if self.class.anonymise_config.associations
+        [
+          result,
+          *self.class.anonymise_config.associations&.flat_map do |association|
+            send(association).map(&:anonymise!)
+          end,
+        ]
+      else
+        result
+      end
     rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
       Result.failed(e)
     end

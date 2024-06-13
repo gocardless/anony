@@ -278,6 +278,65 @@ ModelName.anonymise_for!(:user_id, "user_1234")
 If you attempt to anonymise records with a selector that has not been defined it
 will throw an error.
 
+#### Anonymising associations
+
+You can also use selectors to anonymise associations that should have the same lifetime as
+a given model, which can make it much easier to ensure all related models are anonymised
+together.
+
+For example, if our `Employee` model has an association with an `Address` model and we
+want the `Address` to be anonymised when we anonymise the `Employee`, it can be done like
+this:
+
+```ruby
+class Address < ApplicationRecord
+  belongs_to :employee
+
+  anonymise do
+    overwrite do
+      hex :address_line1, :postal_code
+    end
+  end
+end
+
+class Employees < ApplicationRecord
+  has_one :address
+
+  anonymise do
+    overwrite do
+      hex :first_name
+    end
+
+    selectors do
+      for_association :address
+    end
+  end
+end
+```
+
+By calling `anonymise!` on a record of the `Employee` model, Anony will recursively call
+`anonymise!` on the associated model records as well and return an array of all the
+`Result` objects from all the anonymised records.
+
+```shell
+irb(main):001:0> employee = Employee.find(1)
+=> #<Employee id=1>
+
+irb(main):002:0> employee.anonymised?
+=> false
+
+irb(main):003:0> employee.address.anonymised?
+=> false
+
+irb(main):004:0> employee.anonymise!
+=> [#<Anony::Result status="overwritten" fields=[:first_name] error=nil>,#<Anony::Result status="overwritten" fields=[:address_line1, :postal_code] error=nil>]
+
+irb(main):005:0> employee.anonymised?
+=> true
+
+irb(main):006:0> employee.address.anonymised?
+=> true
+```
 
 ### Identifying anonymised records
 
@@ -492,7 +551,7 @@ Lint/DefineDeletionStrategy:
 If your models use multiple superclasses, you can specify a list of superclasses in your `.rubocop.yml`. Note that you will have to specify `ApplicationRecord` explicitly in this list should you want to lint all models which inherit from `ApplicationRecord`.
 ```yml
 Lint/DefineDeletionStrategy:
-  ModelSuperclass: 
+  ModelSuperclass:
   - Acme::Record
   - UmbrellaCorp::Record
 
