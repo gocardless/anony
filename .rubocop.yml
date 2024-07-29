@@ -17,3 +17,7 @@ Gemspec/RequiredRubyVersion:
 
 RSpec/MultipleExpectations:
   Enabled: false
+
+RSpec/ExampleLength:
+  Max: 15
+

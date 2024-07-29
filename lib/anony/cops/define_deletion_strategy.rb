@@ -22,7 +22,7 @@ module RuboCop
       #
       # @example Bad
       #   class MyNewThing < ApplicationRecord; end
-      class DefineDeletionStrategy < Cop
+      class DefineDeletionStrategy < Base
         MSG = "Define .anonymise for %<model>s, see https://github.com/gocardless/" \
               "anony/blob/#{Anony::VERSION}/README.md for details".freeze
 

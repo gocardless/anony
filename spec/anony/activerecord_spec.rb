@@ -31,7 +31,6 @@ RSpec.context "ActiveRecord integration" do
 
   it_behaves_like "overwritten anonymisable model"
 
-  # rubocop:disable RSpec/ExampleLength
   it "applies the correct changes to each column" do
     expect { instance.anonymise! }.
       to change(instance, :first_name).to(/[\h-]{36}/).
@@ -41,7 +40,6 @@ RSpec.context "ActiveRecord integration" do
       and change(instance, :company_name).to("anonymised-Microsoft").
       and change(instance, :onboarded_at).to be_within(1).of(Time.now)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it "populates the result fields hash with only anonymised fields" do
     result = instance.anonymise!
