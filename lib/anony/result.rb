@@ -9,32 +9,33 @@ module Anony
     OVERWRITTEN = "overwritten"
     SKIPPED = "skipped"
 
-    attr_reader :status, :fields, :error
+    attr_reader :status, :fields, :error, :record
 
     delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
 
-    def self.failed(error)
-      new(FAILED, error: error)
+    def self.failed(error, record = nil)
+      new(FAILED, record: record, error: error)
     end
 
-    def self.overwritten(fields)
-      new(OVERWRITTEN, fields: fields)
+    def self.overwritten(fields, record = nil)
+      new(OVERWRITTEN, record: record, fields: fields)
     end
 
-    def self.skipped
-      new(SKIPPED)
+    def self.skipped(record = nil)
+      new(SKIPPED, record: record)
     end
 
-    def self.destroyed
-      new(DESTROYED)
+    def self.destroyed(record = nil)
+      new(DESTROYED, record: record)
     end
 
-    private def initialize(status, fields: [], error: nil)
+    private def initialize(status, record:, fields: [], error: nil)
       raise ArgumentError, "No error provided" if status == FAILED && error.nil?
 
       @status = ActiveSupport::StringInquirer.new(status)
       @fields = fields
       @error = error
+      @record = record
     end
   end
 end

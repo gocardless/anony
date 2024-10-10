@@ -32,7 +32,7 @@ module Anony
       # @param [ActiveRecord::Base] instance An instance of the model
       def apply(instance)
         instance.destroy!
-        Result.destroyed
+        Result.destroyed(instance)
       end
     end
   end
