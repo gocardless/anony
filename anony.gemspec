@@ -4,9 +4,6 @@ lib = File.expand_path("lib", __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "anony/version"
 
-RAILS_VERSION_LOWER_BOUND = ">= 6.1"
-RAILS_VERSION_UPPER_BOUND = "< 8"
-
 Gem::Specification.new do |spec|
   spec.name          = "anony"
   spec.version       = Anony::VERSION
@@ -40,8 +37,8 @@ Gem::Specification.new do |spec|
     spec.add_dependency "activerecord", "~> #{ENV['RAILS_VERSION']}"
     spec.add_dependency "activesupport", "~> #{ENV['RAILS_VERSION']}"
   else
-    spec.add_dependency "activerecord", RAILS_VERSION_LOWER_BOUND, RAILS_VERSION_UPPER_BOUND
-    spec.add_dependency "activesupport", RAILS_VERSION_LOWER_BOUND, RAILS_VERSION_UPPER_BOUND
+    spec.add_dependency "activerecord", ">= 6.1", "< 8"
+    spec.add_dependency "activesupport", ">= 6.1", "< 8"
   end
   spec.metadata["rubygems_mfa_required"] = "true"
 end
