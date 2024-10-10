@@ -5,6 +5,7 @@
 - Add support for Rails 7.2
 - Fix Dependabot updates
 - Fix `NoMethodError` when calling `selector_for?` or `anonymise_for!` on a model class without an `anonymise` config block
+- Include reference to anonymised record in `Anony::Result` to allow easier matching of results to records when using selectors.
 
 # v1.4.0
 
