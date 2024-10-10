@@ -1,3 +1,13 @@
+# v1.5.0
+
+- Drop support for EOL Ruby 3.0
+- Add support for Rails 7.2
+- Fix Dependabot updates
+
+# v1.4.0
+
+- Update cops to use `Base` rather than `Cop` as a base class as the latter has been deprecated
+
 # v1.3.1
 
 - Update gc_ruboconfig development dependency to v5.0.0
