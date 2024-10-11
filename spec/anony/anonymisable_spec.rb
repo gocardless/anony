@@ -221,20 +221,33 @@ RSpec.describe Anony::Anonymisable do
 
   context "without configuring Anony at all" do
     let(:klass) do
-      MyUnicornModel = Class.new(ActiveRecord::Base) do
+      Class.new(ActiveRecord::Base) do
         include Anony::Anonymisable
 
         self.table_name = :only_ids
       end
     end
 
-    let(:model) { klass.new }
-
     describe "#anonymise!" do
+      let(:model) do
+        MyUnicornModel = klass
+        MyUnicornModel.new
+      end
+
       it "throws an exception" do
         expect { model.anonymise! }.to raise_error(
           ArgumentError, "MyUnicornModel does not have an Anony configuration"
         )
+      end
+    end
+
+    describe "#selector_for?" do
+      it "does not throw an exception" do
+        expect { klass.selector_for?(:foo) }.to_not raise_error
+      end
+
+      it "returns false" do
+        expect(klass.selector_for?(:foo)).to be false
       end
     end
   end

@@ -76,6 +76,8 @@ module Anony
       # @example
       #   Manager.selector_for?(:user_id)
       def selector_for?(subject)
+        return false if anonymise_config.nil?
+
         anonymise_config.selector_for?(subject)
       end
 
