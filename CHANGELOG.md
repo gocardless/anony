@@ -1,6 +1,7 @@
 # v1.5.0
 
-- Drop support for EOL Ruby 3.0
+- Drop support for EOL Ruby 3.0 (EOL since April 1st 2024)
+- Drop support for EOL Rails 6.1 (EOL since October 1st 2024)
 - Add support for Rails 7.2
 - Fix Dependabot updates
 
