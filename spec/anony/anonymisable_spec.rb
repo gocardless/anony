@@ -221,36 +221,75 @@ RSpec.describe Anony::Anonymisable do
 
   context "without configuring Anony at all" do
     let(:klass) do
-      MyUnicornModel = Class.new(ActiveRecord::Base) do
+      Class.new(ActiveRecord::Base) do
         include Anony::Anonymisable
 
         self.table_name = :only_ids
       end
     end
 
-    let(:model) { klass.new }
-
     describe "#anonymise!" do
+      let(:model) do
+        MyUnicornModel = klass
+        MyUnicornModel.new
+      end
+
       it "throws an exception" do
         expect { model.anonymise! }.to raise_error(
           ArgumentError, "MyUnicornModel does not have an Anony configuration"
         )
       end
     end
+
+    describe "#selector_for?" do
+      it "does not throw an exception" do
+        expect { klass.selector_for?(:foo) }.to_not raise_error
+      end
+
+      it "returns false" do
+        expect(klass.selector_for?(:foo)).to be false
+      end
+    end
   end
 
   context "no anonymise block" do
-    describe "#valid_anonymisation?" do
-      let(:klass) do
-        Class.new(ActiveRecord::Base) do
-          include Anony::Anonymisable
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
 
-          self.table_name = :employees
+        def self.name
+          "Employee"
         end
-      end
 
+        self.table_name = :employees
+      end
+    end
+
+    describe "#valid_anonymisation?" do
       it "fails" do
         expect(klass).to_not be_valid_anonymisation
+      end
+    end
+
+    describe "#selector_for?" do
+      it "does not throw an exception" do
+        expect { klass.selector_for?(:foo) }.to_not raise_error
+      end
+
+      it "returns false" do
+        expect(klass.selector_for?(:foo)).to be false
+      end
+    end
+
+    describe "#anonymise_for!" do
+      let(:model) do
+        klass.create!(first_name: "abc", last_name: "foo", company_name: "alpha")
+      end
+
+      it "throws an exception" do
+        expect { klass.anonymise_for!(:first_name, "abc") }.to raise_error(
+          ArgumentError, "Employee does not have an Anony configuration"
+        )
       end
     end
   end
