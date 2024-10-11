@@ -58,6 +58,10 @@ module Anony
       # Finds the records that relate to a particular subject and runs anonymise on
       # each of them. If a selector is not defined it will raise an exception.
       def anonymise_for!(subject, subject_id)
+        unless anonymise_config
+          raise ArgumentError, "#{name} does not have an Anony configuration"
+        end
+
         records = anonymise_config.
           select(subject, subject_id)
         records.map do |record|

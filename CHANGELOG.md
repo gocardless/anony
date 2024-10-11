@@ -4,7 +4,7 @@
 - Drop support for EOL Rails 6.1 (EOL since October 1st 2024)
 - Add support for Rails 7.2
 - Fix Dependabot updates
-- Fix `NoMethodError` when calling `selector_for?` on a model class without an `anonymise` config block
+- Fix `NoMethodError` when calling `selector_for?` or `anonymise_for!` on a model class without an `anonymise` config block
 
 # v1.4.0
 
