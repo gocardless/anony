@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "helpers/database"
 
 RSpec.describe Anony::Result do
   let(:field_values) do
