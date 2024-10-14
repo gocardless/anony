@@ -11,6 +11,12 @@ RSpec.describe Anony::Result do
     }
   end
 
+  shared_context "without model instance" do
+    before do
+      allow(described_class::RESULT_DEPRECATION).to receive(:warn)
+    end
+  end
+
   shared_context "with model instance" do
     let(:klass) do
       Class.new(ActiveRecord::Base) do
@@ -39,6 +45,7 @@ RSpec.describe Anony::Result do
     end
 
     context "without record" do
+      include_context "without model instance"
       let(:result) { described_class.overwritten(field_values) }
 
       it_behaves_like "anonymised result"
@@ -72,6 +79,7 @@ RSpec.describe Anony::Result do
     end
 
     context "without record" do
+      include_context "without model instance"
       let(:result) { described_class.destroyed }
 
       it_behaves_like "destroyed result"
@@ -105,6 +113,7 @@ RSpec.describe Anony::Result do
     end
 
     context "without record" do
+      include_context "without model instance"
       let(:result) { described_class.skipped }
 
       it_behaves_like "skipped result"
@@ -146,6 +155,7 @@ RSpec.describe Anony::Result do
     end
 
     context "without record" do
+      include_context "without model instance"
       let(:result) { described_class.failed(error) }
 
       it_behaves_like "failed result"
