@@ -17,6 +17,7 @@ class User < ActiveRecord::Base
   end
 end
 ```
+
 ```ruby
 irb(main):001:0> user = User.find(1)
 => #<User id="1" first_name="Alice">
@@ -120,10 +121,10 @@ When a model is anonymised, an `Anony::Result` is returned. This allows the libr
 
 The result object has 3 attributes:
 
-  * `status` - If the model was `destroyed`, `overwritten`, `skipped` or the operation `failed`
-  * `fields` - In the event the model was `overwritten`, the fields that were updated (excludes timestamps)
-  * `error` - In the event the anonymisation `failed`, then the associated error. Note only rescues the following errors: `ActiveRecord::RecordNotSaved`, `ActiveRecord::RecordNotDestroyed`. Anything else is thrown.
-  * `record` - The model instance that was anonymised to produce this result.
+* `status` - If the model was `destroyed`, `overwritten`, `skipped` or the operation `failed`
+* `fields` - In the event the model was `overwritten`, the fields that were updated (excludes timestamps)
+* `error` - In the event the anonymisation `failed`, then the associated error. Note only rescues the following errors: `ActiveRecord::RecordNotSaved`, `ActiveRecord::RecordNotDestroyed`. Anything else is thrown.
+* `record` - The model instance that was anonymised to produce this result.
 
 For convenience, the result object can also be queried with `destroyed?`, `overwritten?`, `skipped?` and `failed?`, so that it can be directly interrogated or used in a `switch case` with the `status` property.
 
@@ -131,11 +132,11 @@ For convenience, the result object can also be queried with `destroyed?`, `overw
 
 This library ships with a number of built-in strategies:
 
-  * **nilable** overwrites the field with `nil`
-  * **hex** overwrites the field with random hexadecimal characters
-  * **email** overwrites the field with an email
-  * **phone_number** overwrites the field with a dummy phone number
-  * **current_datetime** overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
+* **nilable** overwrites the field with `nil`
+* **hex** overwrites the field with random hexadecimal characters
+* **email** overwrites the field with an email
+* **phone_number** overwrites the field with a dummy phone number
+* **current_datetime** overwrites the field with `Time.zone.now` (using [ActiveSupport's TimeWithZone](https://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html#method-i-now))
 
 ### Custom strategies
 
@@ -205,7 +206,7 @@ class Manager < ApplicationRecord
 end
 ```
 
-```
+```ruby
 irb(main):001:0> manager = Manager.first
  => #<Manager id=42>
 
@@ -233,7 +234,7 @@ class Manager < ApplicationRecord
 end
 ```
 
-```
+```ruby
 irb(main):001:0> manager = Manager.first
  => #<Manager id=42>
 
@@ -348,7 +349,7 @@ end
 
 The result object will indicate the model was skipped:
 
-```
+```ruby
 irb(main):001:0> manager = Manager.find(1)
  => #<Manager id=1>
 
@@ -368,7 +369,7 @@ available). If your configuration is incomplete, calling `#anonymise!` will rais
 `FieldsException` and will not return an `Anony:Result` object. This is perceived
 to a critical error as anony cannot safely anonymise the model.
 
-```
+```ruby
 irb(main):001:0> manager = Manager.find(1)
  => #<Manager id=1>
 
@@ -408,7 +409,6 @@ Anony::Config.ignore_fields(:id, :created_at, :updated_at)
 
 By default, `Config.ignore_fields` is an empty array and all fields are considered
 anonymisable.
-
 
 ## Testing
 
@@ -476,7 +476,7 @@ require:
 This cop ensures that all models in your application have defined an `anonymise` block.
 The output looks like this:
 
-```
+```text
 app/models/employee.rb:7:1: W: Lint/DefineDeletionStrategy:
   Define .anonymise for Employee, see https://github.com/gocardless/anony/blob/master/README.md for details:
   class Employee < ApplicationRecord ...
@@ -492,17 +492,17 @@ Lint/DefineDeletionStrategy:
 ```
 
 If your models use multiple superclasses, you can specify a list of superclasses in your `.rubocop.yml`. Note that you will have to specify `ApplicationRecord` explicitly in this list should you want to lint all models which inherit from `ApplicationRecord`.
+
 ```yml
 Lint/DefineDeletionStrategy:
   ModelSuperclass:
   - Acme::Record
   - UmbrellaCorp::Record
-
 ```
 
 ## License & Contributing
 
 * Anony is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-* Bug reports and pull requests are welcome on GitHub at https://github.com/gocardless/anony.
+* Bug reports and pull requests are welcome on GitHub at <https://github.com/gocardless/anony>.
 
 GoCardless ♥ open source. If you do too, come [join us](https://gocardless.com/about/jobs).
