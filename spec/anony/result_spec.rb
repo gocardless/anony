@@ -11,12 +11,6 @@ RSpec.describe Anony::Result do
     }
   end
 
-  shared_context "without model instance" do
-    before do
-      allow(described_class::RESULT_DEPRECATION).to receive(:warn)
-    end
-  end
-
   shared_context "with model instance" do
     let(:klass) do
       Class.new(ActiveRecord::Base) do
@@ -34,142 +28,89 @@ RSpec.describe Anony::Result do
   end
 
   context "anonymised" do
-    shared_examples_for "anonymised result" do
-      it "has enumbeable state" do
-        expect(result.status).to eq("overwritten")
-      end
+    include_context "with model instance"
+    let(:result) { described_class.overwritten(field_values, model) }
 
-      it "responds to .overwritten?" do
-        expect(result).to be_overwritten
-      end
+    it "has enumbeable state" do
+      expect(result.status).to eq("overwritten")
     end
 
-    context "without record" do
-      include_context "without model instance"
-      let(:result) { described_class.overwritten(field_values) }
-
-      it_behaves_like "anonymised result"
+    it "responds to .overwritten?" do
+      expect(result).to be_overwritten
     end
 
-    context "with record" do
-      include_context "with model instance"
-      let(:result) { described_class.overwritten(field_values, model) }
-
-      it_behaves_like "anonymised result"
-
-      it "contains the model" do
-        expect(result.record).to be model
-      end
+    it "contains the model" do
+      expect(result.record).to be model
     end
   end
 
   context "deleted" do
-    shared_examples_for "destroyed result" do
-      it "has enumbeable state" do
-        expect(result.status).to eq("destroyed")
-      end
+    include_context "with model instance"
+    let(:result) { described_class.destroyed(model) }
 
-      it "responds to .destroyed?" do
-        expect(result).to be_destroyed
-      end
-
-      it "has no fields" do
-        expect(result.fields).to be_empty
-      end
+    it "has enumbeable state" do
+      expect(result.status).to eq("destroyed")
     end
 
-    context "without record" do
-      include_context "without model instance"
-      let(:result) { described_class.destroyed }
-
-      it_behaves_like "destroyed result"
+    it "responds to .destroyed?" do
+      expect(result).to be_destroyed
     end
 
-    context "with record" do
-      include_context "with model instance"
-      let(:result) { described_class.destroyed(model) }
+    it "has no fields" do
+      expect(result.fields).to be_empty
+    end
 
-      it_behaves_like "destroyed result"
-
-      it "contains the model" do
-        expect(result.record).to be model
-      end
+    it "contains the model" do
+      expect(result.record).to be model
     end
   end
 
   context "skipped" do
-    shared_examples_for "skipped result" do
-      it "has enumbeable state" do
-        expect(result.status).to eq("skipped")
-      end
+    include_context "with model instance"
+    let(:result) { described_class.skipped(model) }
 
-      it "responds to .skipped?" do
-        expect(result).to be_skipped
-      end
-
-      it "has no fields" do
-        expect(result.fields).to be_empty
-      end
+    it "has enumbeable state" do
+      expect(result.status).to eq("skipped")
     end
 
-    context "without record" do
-      include_context "without model instance"
-      let(:result) { described_class.skipped }
-
-      it_behaves_like "skipped result"
+    it "responds to .skipped?" do
+      expect(result).to be_skipped
     end
 
-    context "with record" do
-      include_context "with model instance"
-      let(:result) { described_class.skipped(model) }
+    it "has no fields" do
+      expect(result.fields).to be_empty
+    end
 
-      it_behaves_like "skipped result"
-
-      it "contains the model" do
-        expect(result.record).to be model
-      end
+    it "contains the model" do
+      expect(result.record).to be model
     end
   end
 
   context "failed" do
+    include_context "with model instance"
     let(:error) { anything }
+    let(:result) { described_class.failed(error, model) }
 
-    shared_examples_for "failed result" do
-      it "has an error" do
-        expect(result.error).to eq(error)
-      end
+    it "has an error" do
+      expect(result.error).to eq(error)
+    end
 
-      it "has enumbeable state" do
-        expect(result.status).to eq("failed")
-      end
+    it "has enumbeable state" do
+      expect(result.status).to eq("failed")
+    end
 
-      it "responds to .failed?" do
-        expect(result).to be_failed
-      end
+    it "responds to .failed?" do
+      expect(result).to be_failed
+    end
 
-      context "without an error" do
-        it "raises an exception" do
-          expect { described_class.failed(nil) }.to raise_error(ArgumentError)
-        end
+    context "without an error" do
+      it "raises an exception" do
+        expect { described_class.failed(nil) }.to raise_error(ArgumentError)
       end
     end
 
-    context "without record" do
-      include_context "without model instance"
-      let(:result) { described_class.failed(error) }
-
-      it_behaves_like "failed result"
-    end
-
-    context "with record" do
-      include_context "with model instance"
-      let(:result) { described_class.failed(error, model) }
-
-      it_behaves_like "failed result"
-
-      it "contains the model" do
-        expect(result.record).to be model
-      end
+    it "contains the model" do
+      expect(result.record).to be model
     end
   end
 end

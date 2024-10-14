@@ -13,33 +13,24 @@ module Anony
 
     delegate :failed?, :overwritten?, :skipped?, :destroyed?, to: :status
 
-    RESULT_DEPRECATION = ActiveSupport::Deprecation.new("2.0.0", "anony")
-
-    def self.failed(error, record = nil)
+    def self.failed(error, record)
       new(FAILED, record: record, error: error)
     end
 
-    def self.overwritten(fields, record = nil)
+    def self.overwritten(fields, record)
       new(OVERWRITTEN, record: record, fields: fields)
     end
 
-    def self.skipped(record = nil)
+    def self.skipped(record)
       new(SKIPPED, record: record)
     end
 
-    def self.destroyed(record = nil)
+    def self.destroyed(record)
       new(DESTROYED, record: record)
     end
 
     private def initialize(status, record:, fields: [], error: nil)
       raise ArgumentError, "No error provided" if status == FAILED && error.nil?
-
-      if record.nil?
-        RESULT_DEPRECATION.warn(
-          "Creating a Result without a reference to the record being anonymised is deprecated " \
-          "and will be removed in future versions",
-        )
-      end
 
       @status = ActiveSupport::StringInquirer.new(status)
       @fields = fields
