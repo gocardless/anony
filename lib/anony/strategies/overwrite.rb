@@ -58,7 +58,7 @@ module Anony
 
         instance.save!
 
-        Result.overwritten(result_fields)
+        Result.overwritten(result_fields, instance)
       end
 
       # Configure a custom strategy for one or more fields. If a block is given that is used

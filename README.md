@@ -123,6 +123,7 @@ The result object has 3 attributes:
   * `status` - If the model was `destroyed`, `overwritten`, `skipped` or the operation `failed`
   * `fields` - In the event the model was `overwritten`, the fields that were updated (excludes timestamps)
   * `error` - In the event the anonymisation `failed`, then the associated error. Note only rescues the following errors: `ActiveRecord::RecordNotSaved`, `ActiveRecord::RecordNotDestroyed`. Anything else is thrown.
+  * `record` - The model instance that was anonymised to produce this result.
 
 For convenience, the result object can also be queried with `destroyed?`, `overwritten?`, `skipped?` and `failed?`, so that it can be directly interrogated or used in a `switch case` with the `status` property.
 
@@ -278,6 +279,7 @@ ModelName.anonymise_for!(:user_id, "user_1234")
 If you attempt to anonymise records with a selector that has not been defined it
 will throw an error.
 
+When anonymising models using selectors, an array of `Anony::Result` objects will be returned, one result per anonymised record in the model. These results contain a reference to the record that was anonymised to produce that result, so that changes made or failures can easily be linked back to the specific record.
 
 ### Identifying anonymised records
 
@@ -492,7 +494,7 @@ Lint/DefineDeletionStrategy:
 If your models use multiple superclasses, you can specify a list of superclasses in your `.rubocop.yml`. Note that you will have to specify `ApplicationRecord` explicitly in this list should you want to lint all models which inherit from `ApplicationRecord`.
 ```yml
 Lint/DefineDeletionStrategy:
-  ModelSuperclass: 
+  ModelSuperclass:
   - Acme::Record
   - UmbrellaCorp::Record
 

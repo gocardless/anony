@@ -25,6 +25,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.1"
 
   spec.add_development_dependency "bundler", "~> 2"
+  spec.add_development_dependency "database_cleaner-active_record", "~> 2.2"
   spec.add_development_dependency "gc_ruboconfig", "~> 5.0.0"
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "rspec-github", "~> 2.4.0"

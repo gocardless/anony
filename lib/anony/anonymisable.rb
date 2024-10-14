@@ -102,7 +102,7 @@ module Anony
       self.class.anonymise_config.validate!
       self.class.anonymise_config.apply(self)
     rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
-      Result.failed(e)
+      Result.failed(e, self)
     end
 
     def anonymised?

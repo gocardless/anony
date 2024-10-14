@@ -10,8 +10,25 @@ RSpec.describe Anony::Result do
     }
   end
 
+  shared_context "with model instance" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        def self.name
+          "Employee"
+        end
+
+        self.table_name = :employees
+      end
+    end
+
+    let(:model) { klass.new }
+  end
+
   context "anonymised" do
-    let(:result) { described_class.overwritten(field_values) }
+    include_context "with model instance"
+    let(:result) { described_class.overwritten(field_values, model) }
 
     it "has enumbeable state" do
       expect(result.status).to eq("overwritten")
@@ -20,10 +37,15 @@ RSpec.describe Anony::Result do
     it "responds to .overwritten?" do
       expect(result).to be_overwritten
     end
+
+    it "contains the model" do
+      expect(result.record).to be model
+    end
   end
 
   context "deleted" do
-    let(:result) { described_class.destroyed }
+    include_context "with model instance"
+    let(:result) { described_class.destroyed(model) }
 
     it "has enumbeable state" do
       expect(result.status).to eq("destroyed")
@@ -36,10 +58,15 @@ RSpec.describe Anony::Result do
     it "has no fields" do
       expect(result.fields).to be_empty
     end
+
+    it "contains the model" do
+      expect(result.record).to be model
+    end
   end
 
   context "skipped" do
-    let(:result) { described_class.skipped }
+    include_context "with model instance"
+    let(:result) { described_class.skipped(model) }
 
     it "has enumbeable state" do
       expect(result.status).to eq("skipped")
@@ -52,11 +79,16 @@ RSpec.describe Anony::Result do
     it "has no fields" do
       expect(result.fields).to be_empty
     end
+
+    it "contains the model" do
+      expect(result.record).to be model
+    end
   end
 
   context "failed" do
+    include_context "with model instance"
     let(:error) { anything }
-    let(:result) { described_class.failed(error) }
+    let(:result) { described_class.failed(error, model) }
 
     it "has an error" do
       expect(result.error).to eq(error)
@@ -74,6 +106,10 @@ RSpec.describe Anony::Result do
       it "raises an exception" do
         expect { described_class.failed(nil) }.to raise_error(ArgumentError)
       end
+    end
+
+    it "contains the model" do
+      expect(result.record).to be model
     end
   end
 end

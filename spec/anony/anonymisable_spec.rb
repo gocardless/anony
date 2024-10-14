@@ -69,18 +69,18 @@ RSpec.describe Anony::Anonymisable do
         end
       end
 
-      context "single record" do
-        it "changes the matching record" do
-          klass.anonymise_for!(:first_name, model.first_name)
-          expect(model.reload.anonymised?).to eq(true)
-          expect(model_b.reload.anonymised?).to eq(false)
-        end
+      it "anonymises only the matching models: first_name" do
+        results = klass.anonymise_for!(:first_name, model.first_name)
+        expect(model.reload.anonymised?).to eq(true)
+        expect(model_b.reload.anonymised?).to eq(false)
+        expect(results.map(&:record)).to contain_exactly(model)
       end
 
       it "anonymises only the matching models: company_name" do
-        klass.anonymise_for!(:company_name, model.company_name)
+        results = klass.anonymise_for!(:company_name, model.company_name)
         expect(model.reload.anonymised?).to be(true)
         expect(model_b.reload.anonymised?).to be(true)
+        expect(results.map(&:record)).to contain_exactly(model, model_b)
       end
     end
 
