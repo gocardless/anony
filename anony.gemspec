@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
     spec.add_dependency "activesupport", "~> #{ENV['RAILS_VERSION']}"
   else
     spec.add_dependency "activerecord", ">= 7.0", "< 8"
-    spec.add_dependency "activesupport", ">= 7.0", "< 8"
+    spec.add_dependency "activesupport", ">= 7.0", "< 9"
   end
   spec.metadata["rubygems_mfa_required"] = "true"
 end
