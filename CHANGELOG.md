@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.0
+
+- Add support for Rails 8.0
+
 ## v1.5.0
 
 - Drop support for EOL Ruby 3.0 (EOL since April 1st 2024)
