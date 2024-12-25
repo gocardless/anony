@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "yard", "~> 0.9.20"
 
   # For integration testing
-  spec.add_development_dependency "sqlite3", "~> 2.4.0"
+  spec.add_development_dependency "sqlite3", "~> 2.5.0"
 
   if ENV["RAILS_VERSION"]
     spec.add_dependency "activerecord", "~> #{ENV['RAILS_VERSION']}"
