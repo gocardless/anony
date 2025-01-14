@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "database_cleaner-active_record", "~> 2.2"
   spec.add_development_dependency "gc_ruboconfig", "~> 5.0.0"
   spec.add_development_dependency "rspec", "~> 3.9"
-  spec.add_development_dependency "rspec-github", "~> 2.4.0"
+  spec.add_development_dependency "rspec-github", "~> 3.0.0"
   spec.add_development_dependency "yard", "~> 0.9.20"
 
   # For integration testing
