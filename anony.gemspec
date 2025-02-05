@@ -24,16 +24,6 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.1"
 
-  spec.add_development_dependency "bundler", "~> 2"
-  spec.add_development_dependency "database_cleaner-active_record", "~> 2.2"
-  spec.add_development_dependency "gc_ruboconfig", "~> 5.0.0"
-  spec.add_development_dependency "rspec", "~> 3.9"
-  spec.add_development_dependency "rspec-github", "~> 2.4.0"
-  spec.add_development_dependency "yard", "~> 0.9.20"
-
-  # For integration testing
-  spec.add_development_dependency "sqlite3", "~> 2.4.0"
-
   if ENV["RAILS_VERSION"]
     spec.add_dependency "activerecord", "~> #{ENV['RAILS_VERSION']}"
     spec.add_dependency "activesupport", "~> #{ENV['RAILS_VERSION']}"
