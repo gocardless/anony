@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add support for Ruby 3.4
+
 ## v1.6.0
 
 - Add support for Rails 8.0
