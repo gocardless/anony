@@ -112,6 +112,12 @@ RSpec.describe Anony::Anonymisable do
         end
       end
     end
+
+    describe "#requires_anonymisation?" do
+      it "requires anonymisation" do
+        expect(klass.requires_anonymisation?).to be true
+      end
+    end
   end
 
   context "destroy on anonymise" do
@@ -135,11 +141,62 @@ RSpec.describe Anony::Anonymisable do
 
         model.anonymise!
       end
+
+      it "returns a destroyed result" do
+        expect(model.anonymise!.destroyed?).to be true
+      end
     end
 
     describe "#valid_anonymisation?" do
       it "is valid" do
         expect(klass).to be_valid_anonymisation
+      end
+    end
+
+    describe "#requires_anonymisation?" do
+      it "requires anonymisation" do
+        expect(klass.requires_anonymisation?).to be true
+      end
+    end
+  end
+
+  context "ignore anonymise" do
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        self.table_name = :employees
+
+        anonymise do
+          ignore
+        end
+      end
+    end
+
+    let(:model) { klass.new }
+
+    describe "#anonymise!" do
+      it "skips the model" do
+        expect(model).to_not receive(:destroy!)
+        expect(model).to_not receive(:write_attribute)
+
+        model.anonymise!
+      end
+
+      it "returns a skipped result" do
+        expect(model.anonymise!.skipped?).to be true
+      end
+    end
+
+    describe "#valid_anonymisation?" do
+      it "is valid" do
+        expect(klass).to be_valid_anonymisation
+      end
+    end
+
+    describe "#requires_anonymisation?" do
+      it "does not require anonymisation" do
+        expect(klass.requires_anonymisation?).to be false
       end
     end
   end

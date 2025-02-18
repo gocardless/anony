@@ -4,8 +4,12 @@ require_relative "../field_level_strategies"
 
 module Anony
   module Strategies
-    # The interface for configuring a field-level strategy. All of the methods here are
-    # made available inside the `overwrite { ... }` block:
+    # The interface for configuring a field-level strategy. This strategy is not compatible
+    # with the following strategies:
+    # * Anony::Strategies::Destroy
+    # * Anony::Strategies::Ignore
+    #
+    # All of the methods here are made available inside the `overwrite { ... }` block:
     #
     # @example
     #   anonymise do

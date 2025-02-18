@@ -3,6 +3,7 @@
 require "active_support/core_ext/module/delegation"
 
 require_relative "strategies/destroy"
+require_relative "strategies/ignore"
 require_relative "strategies/overwrite"
 require_relative "selectors"
 
@@ -50,7 +51,7 @@ module Anony
     delegate :select, to: :@selectors_config
 
     # Use the deletion strategy instead of anonymising individual fields. This method is
-    # incompatible with the fields strategy.
+    # incompatible with the overwrite strategy.
     #
     # This method takes no arguments or blocks.
     #
@@ -65,6 +66,24 @@ module Anony
       end
 
       @strategy = Strategies::Destroy.new
+    end
+
+    # Use the ignore strategy instead of anonymising anything. This method is
+    # incompatible with the overwrite and destroy strategies.
+    #
+    # This method takes no arguments or blocks.
+    #
+    # @example
+    #   anonymise do
+    #     ignore
+    #   end
+    def ignore
+      raise ArgumentError, ":ignore takes no block" if block_given?
+      unless @strategy.is_a?(UndefinedStrategy)
+        raise ArgumentError, "Cannot specify :ignore when another strategy already defined"
+      end
+
+      @strategy = Strategies::Ignore.new
     end
 
     # Use the overwrite strategy to configure rules for individual fields. This method is
