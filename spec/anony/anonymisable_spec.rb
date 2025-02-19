@@ -112,12 +112,6 @@ RSpec.describe Anony::Anonymisable do
         end
       end
     end
-
-    describe "#requires_anonymisation?" do
-      it "requires anonymisation" do
-        expect(klass.requires_anonymisation?).to be true
-      end
-    end
   end
 
   context "destroy on anonymise" do
@@ -150,12 +144,6 @@ RSpec.describe Anony::Anonymisable do
     describe "#valid_anonymisation?" do
       it "is valid" do
         expect(klass).to be_valid_anonymisation
-      end
-    end
-
-    describe "#requires_anonymisation?" do
-      it "requires anonymisation" do
-        expect(klass.requires_anonymisation?).to be true
       end
     end
   end
@@ -191,12 +179,6 @@ RSpec.describe Anony::Anonymisable do
     describe "#valid_anonymisation?" do
       it "is valid" do
         expect(klass).to be_valid_anonymisation
-      end
-    end
-
-    describe "#requires_anonymisation?" do
-      it "does not require anonymisation" do
-        expect(klass.requires_anonymisation?).to be false
       end
     end
   end

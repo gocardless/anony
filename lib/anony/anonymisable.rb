@@ -85,18 +85,6 @@ module Anony
         anonymise_config.selector_for?(subject)
       end
 
-      # Checks if a model uses a strategy that requires anonymisation. Returns false if the strategy
-      # is ignore, or true for all other strategies
-      # This is useful for checking to see whether a model needs to be anonymised or not.
-      # @return [Boolean]
-      # @example
-      #   Manager.requires_anonymisation?
-      def requires_anonymisation?
-        return false unless @anonymise_config
-
-        !@anonymise_config.instance_variable_get(:@strategy).is_a? Strategies::Ignore
-      end
-
       attr_reader :anonymise_config
     end
 
