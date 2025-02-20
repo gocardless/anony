@@ -13,6 +13,6 @@ group :development, :test do
   gem "gc_ruboconfig", "~> 5.0.0"
   gem "rspec", "~> 3.9"
   gem "rspec-github", "~> 3.0.0"
-  gem "sqlite3", "~> 2.5.0"
+  gem "sqlite3", "~> 2.6.0"
   gem "yard", "~> 0.9.20"
 end
