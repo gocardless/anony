@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## v1.7.0
 
 - Add support for Ruby 3.4
+- Add global configuration option to skip validating models before anonymisation
 
 ## v1.6.0
 
