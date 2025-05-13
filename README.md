@@ -410,6 +410,28 @@ Anony::Config.ignore_fields(:id, :created_at, :updated_at)
 By default, `Config.ignore_fields` is an empty array and all fields are considered
 anonymisable.
 
+### Preventing model validation before anonymisation
+
+There are cases where models may contain data that is not valid according to the validations defined on the model, and
+the default behaviour of Anony is to validate the model before anonymisation.
+
+If it is necessary to be able to anonymise models even if they contain invalid data, Anony can be configured to skip this
+validation, in which case the validations will only be run when using strategies that modify the model data, and will run
+after anonymisation when the model is saved.
+
+To configure this behaviour, you can set the following configuration option in an initializer:
+
+```ruby
+# config/initializers/anony.rb
+
+Anony::Config.validate_before_anonymisation = false
+```
+
+> Note: If you set this configuration option to `false`, be aware that a model that is invalid before anonymisation and continues
+  to be invalid after anonymisation may have new validation failures caused by the anonymisation if a strategy is incorrectly
+  defined for the model. It is recommended that you perform the anonymisation in a database transaction and roll it back if there
+  are validation errors after anonymisation.
+
 ## Testing
 
 This library ships with a set of useful RSpec examples for your specs. Just require them

@@ -99,7 +99,7 @@ module Anony
         raise ArgumentError, "#{self.class.name} does not have an Anony configuration"
       end
 
-      self.class.anonymise_config.validate!
+      self.class.anonymise_config.validate! if Config.validate_before_anonymisation
       self.class.anonymise_config.apply(self)
     rescue ActiveRecord::RecordNotSaved, ActiveRecord::RecordNotDestroyed => e
       Result.failed(e, self)

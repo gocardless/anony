@@ -410,6 +410,69 @@ RSpec.describe Anony::Anonymisable do
     end
   end
 
+  context "with validate_before_anonymisation flag set to false in Anony::Config" do
+    around do |example|
+      original_validate_before_anonymisation = Anony::Config.validate_before_anonymisation
+      example.call
+    ensure
+      Anony::Config.validate_before_anonymisation = original_validate_before_anonymisation
+    end
+
+    before { Anony::Config.validate_before_anonymisation = false }
+
+    let(:klass) do
+      Class.new(ActiveRecord::Base) do
+        include Anony::Anonymisable
+
+        validates :first_name, length: { maximum: 20 }
+        validates :last_name, length: { maximum: 20 }
+
+        self.table_name = :employees
+
+        def self.model_name
+          ActiveModel::Name.new(self, nil, "Employee")
+        end
+
+        anonymise do
+          overwrite do
+            with_strategy StubAnoynmiser, :first_name
+
+            ignore :id, :company_name, :last_name, :email_address, :missing_field, :phone_number,
+                   :onboarded_at
+          end
+        end
+      end
+    end
+
+    it "does not throw an exception if model is valid after anonymisation" do
+      model = klass.new(
+        first_name: "abcdefghijklmnopqrstuvwxyz",
+        last_name: "foo",
+        company_name: "alpha",
+      )
+      model.save(validate: false)
+
+      expect(model).to_not be_valid
+
+      expect { model.anonymise! }.to_not raise_error
+
+      expect(model).to be_valid
+    end
+
+    it "throws an exception if model is invalid after anonymisation" do
+      model = klass.new(
+        first_name: "abcdefghijklmnopqrstuvwxyz",
+        last_name: "zyxwvutsrqonmlkjihgfedcba",
+        company_name: "alpha",
+      )
+      model.save(validate: false)
+
+      expect(model).to_not be_valid
+
+      expect { model.anonymise! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   context "with two models" do
     let(:a_class) do
       Class.new(ActiveRecord::Base) do

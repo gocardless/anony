@@ -12,7 +12,7 @@ module Anony
   #
   #   Anony::Config.ignore_fields(:id)
   module Config
-    mattr_accessor :ignores
+    mattr_accessor :ignores, :validate_before_anonymisation
 
     # @!visibility private
     def self.ignore?(field)
@@ -38,5 +38,14 @@ module Anony
     end
 
     self.ignores = []
+
+    # Config option to change behaviour so that validations on models being anonymised
+    # are not run before anonymisation has been performed. This means that if an invalid model
+    # would become valid after anonymisation, it will not raise an error when being anonymised.
+    #
+    # Validations are still run for the overwrite strategy when the changes to the model are saved
+    #
+    # By default this is set to true, to maintain existing behaviour
+    self.validate_before_anonymisation = true
   end
 end
