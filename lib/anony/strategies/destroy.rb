@@ -22,7 +22,7 @@ module Anony
       # configuration, so #validate! always returns true
       #
       # @return [true]
-      def validate!
+      def validate! # rubocop:disable Naming/PredicateMethod
         true
       end
 
