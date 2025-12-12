@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fix link for `DefineDeletionStrategy` cop check
+
 ## v1.7.0
 
 - Add support for Ruby 3.4
