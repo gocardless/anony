@@ -13,7 +13,7 @@ RSpec.describe RuboCop::Cop::Lint::DefineDeletionStrategy, :config do
 
   let(:error_msg) do
     "Define .anonymise for %s, see https://github.com/gocardless/anony/" \
-      "blob/#{Anony::VERSION}/README.md for details"
+      "blob/v#{Anony::VERSION}/README.md for details"
   end
 
   context "when it isn't a model" do
