@@ -10,7 +10,7 @@ gemspec
 group :development, :test do
   gem "bundler", "~> 2"
   gem "database_cleaner-active_record", "~> 2.2"
-  gem "gc_ruboconfig", "~> 5.0.0"
+  gem "gc_ruboconfig", "~> 6.0.0"
   gem "rspec", "~> 3.9"
   gem "rspec-github", "~> 3.0.0"
   gem "sqlite3", "~> 2.8.0"
