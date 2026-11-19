@@ -19,9 +19,8 @@ module Anony
       # In this case, we want to support literal matches, regular expressions and blocks,
       # all of which are helpfully handled by Object#===.
       #
-      # rubocop:disable Style/CaseEquality
+      # rubocop:disable-next Style/CaseEquality
       ignores.any? { |rule| rule === field }
-      # rubocop:enable Style/CaseEquality
     end
 
     # A list of database or model properties to be ignored when anonymising. This is
